@@ -10,11 +10,13 @@ services:
     ports:
       - "5432:5432"
 
-  web:
-    build: .
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --app-dir app
+  service:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     volumes:
-      - .:/app
+      - ./app:/app
     ports:
       - "8000:8000"
     environment:
@@ -25,6 +27,17 @@ services:
       - TIMEZONE=${TIMEZONE}
     depends_on:
       - db
+
+  frontend:
+    build:
+      context: ./manager_ui
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000" 
+    volumes:
+      - ./manager_ui:/manager_ui
+    environment:
+      - CHOKIDAR_USEPOLLING=true 
 
 volumes:
   db_data:
