@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: eosync_auth
+      POSTGRES_DB: eosync
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  web:
+    build: .
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --app-dir app
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://admin:eosync_auth@db:5432/eosync
+      - PROJECT_NAME=${PROJECT_NAME}
+      - WORK_START=${WORK_START}
+      - WORK_END=${WORK_END}
+      - TIMEZONE=${TIMEZONE}
+    depends_on:
+      - db
+
+volumes:
+  db_data:
