@@ -1,23 +1,33 @@
 "use client";
 
-import { Download } from "lucide-react";
-
+import { useEffect, useState } from "react";
+import { getSkills, deleteSkill } from "../utils/api"
 import { DataTable } from "@/components/data-table/data-table";
 import { DataTablePagination } from "@/components/data-table/data-table-pagination";
-import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardAction } from "@/components/ui/card";
 import { useDataTableInstance } from "@/hooks/use-data-table-instance";
 
 import { recentLeadsColumns } from "./columns.crm";
-import { recentLeadsData } from "./crm.config";
 
 export function TableCards() {
+  const [skills, setSkills] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getSkills()
+      .then((data) => setSkills(data))
+      .catch((err) => console.error("Error while fetching skills:", err))
+      .finally(() => setLoading(false));
+  }, []);
+
   const table = useDataTableInstance({
-    data: recentLeadsData,
+    data: skills,
     columns: recentLeadsColumns,
     getRowId: (row) => row.id.toString(),
   });
+
+  if (loading) return <p>Loading...</p>;
 
   return (
     <div className="grid grid-cols-1 gap-4 *:data-[slot=card]:shadow-xs">
@@ -28,8 +38,7 @@ export function TableCards() {
           <CardAction>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm">
-                <Download />
-                <span className="hidden lg:inline">Export</span>
+                Export
               </Button>
             </div>
           </CardAction>

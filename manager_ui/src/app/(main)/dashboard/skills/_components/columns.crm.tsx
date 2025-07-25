@@ -1,9 +1,8 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Trash } from "lucide-react";
 import z from "zod";
-
+import { deleteSkill } from "../utils/api";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 import { recentLeadSchema } from "./schema";
@@ -24,12 +23,17 @@ export const recentLeadsColumns: ColumnDef<z.infer<typeof recentLeadSchema>>[] =
   },
   {
     id: "actions",
-    cell: () => (
-      <Button variant="ghost" className="text-muted-foreground flex size-8" size="icon">
+    cell: ({ row }) => (
+      <Button
+        variant="ghost"
+        className="text-muted-foreground flex size-8"
+        size="icon"
+        onClick={() => deleteSkill(row.original.id)}
+      >
         <Trash />
-        <span className="sr-only">Open menu</span>
+        <span className="sr-only">Delete</span>
       </Button>
     ),
     enableSorting: false,
-  },
+  }
 ];
