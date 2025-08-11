@@ -13,14 +13,14 @@ def create_employee(
     db: Session = Depends(get_db)
 ):
     if isinstance(emp, list):
-        db_emps = [EmployeeModel(**e.dict()) for e in emp]
+        db_emps = [EmployeeModel(**e.model_dump()) for e in emp]
         db.add_all(db_emps)
         db.commit()
         for e in db_emps:
             db.refresh(e)
         return db_emps
     else:
-        db_emp = EmployeeModel(**emp.dict())
+        db_emp = EmployeeModel(**emp.model_dump())
         db.add(db_emp)
         db.commit()
         db.refresh(db_emp)

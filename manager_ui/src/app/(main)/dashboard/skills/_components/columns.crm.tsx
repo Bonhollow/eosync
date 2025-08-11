@@ -1,13 +1,12 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Trash } from "lucide-react";
-import z from "zod";
 import { deleteSkill } from "../utils/api";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Button } from "@/components/ui/button";
+import { skillSchema } from "./schema";
+import { z } from "zod";
 
-import { recentLeadSchema } from "./schema";
-
-export const recentLeadsColumns: ColumnDef<z.infer<typeof recentLeadSchema>>[] = [
+export const skillsColumns: ColumnDef<z.infer<typeof skillSchema>>[] = [
   {
     accessorKey: "id",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Ref" />,
@@ -28,7 +27,7 @@ export const recentLeadsColumns: ColumnDef<z.infer<typeof recentLeadSchema>>[] =
         variant="ghost"
         className="text-muted-foreground flex size-8"
         size="icon"
-        onClick={() => deleteSkill(row.original.id)}
+        onClick={() => deleteSkill(parseInt(row.original.id.toString()))}
       >
         <Trash />
         <span className="sr-only">Delete</span>

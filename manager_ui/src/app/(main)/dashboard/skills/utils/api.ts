@@ -5,8 +5,13 @@ export async function getSkills() {
     return response.data;
 }
 
-export async function postSkill(name: string) {
-    const response = await axios.post("http://localhost:8000/skills", { name });
+export async function createSkill(skills: string[]) {
+    const response = await axios.post("http://localhost:8000/skills", skills);
+    return response.data;
+}
+
+export async function createSkillsFromFile(file: File) {
+    const response = await axios.post("http://localhost:8000/skills", { file });
     return response.data;
 }
 

@@ -1,19 +1,23 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Union
 from core.database import get_db
 from models.skill import Skill as SkillModel
 from schemas.skill import SkillCreate, Skill as SkillSchema
 
 router = APIRouter()
 
-@router.post("/", response_model=SkillSchema)
-def create_skill(skill: SkillCreate, db: Session = Depends(get_db)):
-    db_skill = SkillModel(**skill.dict())
-    db.add(db_skill)
+
+@router.post("/", response_model=list[SkillSchema])
+def create_skills(skills: List[str], db: Session = Depends(get_db)):
+    skill_names = list(dict.fromkeys([s.strip() for s in skills if s.strip()]))
+
+    db_skills = [SkillModel(name=skill_name) for skill_name in skill_names]
+    db.add_all(db_skills)
     db.commit()
-    db.refresh(db_skill)
-    return db_skill
+    for db_skill in db_skills:
+        db.refresh(db_skill)
+    return db_skills
 
 @router.get("/", response_model=List[SkillSchema])
 def read_skills(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):

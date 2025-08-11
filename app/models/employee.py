@@ -6,15 +6,15 @@ class Employee(Base):
     __tablename__ = 'employees'
 
     id = Column(Integer, primary_key=True, index=True)
-    first_name = Column(String, nullable=False)
+    first_name = Column(String, nullable=True)
     last_name = Column(String, nullable=False)
-    birth_date = Column(Date, nullable=False)
-    email = Column(String, unique=True, index=True, nullable=False)
+    birth_date = Column(Date, nullable=True)
+    email = Column(String, unique=True, index=True, nullable=True)
     phone = Column(String, nullable=True)
-    hire_date = Column(Date, nullable=False)
-    role = Column(String, nullable=True)
+    hire_date = Column(Date, nullable=True)
+    role = Column(String, nullable=False)
     department = Column(String, nullable=True)
-    salary = Column(Float, nullable=False)
+    salary = Column(Float, nullable=True)
 
     skills = relationship('Skill', secondary='employee_skills', back_populates='employees')
     assignments = relationship('Assignment', back_populates='employee')
