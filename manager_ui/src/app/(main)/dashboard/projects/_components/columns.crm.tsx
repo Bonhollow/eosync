@@ -272,15 +272,15 @@ export const getProjectsColumns = ({ onDelete }: GetProjectsColumnsProps): Colum
                     <p className="text-sm text-muted-foreground">{task.description}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                     <Badge variant={task.status === 'Done' ? 'default' : 'secondary'}>{task.status}</Badge>
-                     <Button variant="ghost" size="icon" className="text-muted-foreground" onClick={() => setEditingTask(task)}><Pen className="size-4" /></Button>
-                     <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDeleteTask(task.id)}><Trash className="size-4" /></Button>
+                    <Badge variant={task.status === 'Done' ? 'default' : 'secondary'}>{task.status}</Badge>
+                    <Button variant="ghost" size="icon" className="text-muted-foreground" onClick={() => setEditingTask(task)}><Pen className="size-4" /></Button>
+                    <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDeleteTask(task.id)}><Trash className="size-4" /></Button>
                   </div>
                 </div>
               ))}
-               {tasks.length === 0 && !isFormOpen && (
-                <p className="text-center text-muted-foreground py-4">No tasks found for this project.</p>
-               )}
+                {tasks.length === 0 && !isFormOpen && (
+                  <p className="text-center text-muted-foreground py-4">No tasks found for this project.</p>
+                )}
             </div>
           </DialogContent>
         </Dialog>

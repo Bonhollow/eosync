@@ -3,22 +3,22 @@ import { Pen, Trash } from "lucide-react";
 import { useState } from "react";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Button } from "@/components/ui/button";
-
+import { Badge } from "@/components/ui/badge";
 import { Employee } from "./schema";
 import { deleteEmployee, editEmployee } from "../utils/api";
-
+import { Wrench } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
+  DialogDescription
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import Select from 'react-select';
 import { customStyles } from "../utils/customStyles";
 
-// Define the type for the payload sent to the PUT endpoint.
-// It must match the backend's EmployeeUpdate schema.
 interface EmployeeUpdatePayload {
   first_name?: string | null;
   last_name?: string;
@@ -29,16 +29,14 @@ interface EmployeeUpdatePayload {
   role?: string;
   department?: string | null;
   salary?: number | null;
-  skill_ids?: number[]; // <-- The important change
+  skill_ids?: number[];
 }
 
-// Ensure the SkillOption value is a number to match the skill ID type.
 type SkillOption = {
-  value: number; // <-- CHANGED from string to number
+  value: number; 
   label: string;
 };
 
-// This function now generates the columns for the employee data table.
 export const getEmployeesColumns = (skillOptions: SkillOption[]): ColumnDef<Employee>[] => [
   {
     accessorKey: "first_name",
@@ -83,16 +81,49 @@ export const getEmployeesColumns = (skillOptions: SkillOption[]): ColumnDef<Empl
     enableSorting: false,
   },
   {
-    accessorKey: "skills",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Skills" />,
-    cell: ({ row }) => (
-      <span className="whitespace-nowrap">
-        {row.original.skills && row.original.skills.length > 0 
-          ? row.original.skills.map(skill => skill.name).join(', ') 
-          : "-"}
-      </span>
-    ),
-    enableSorting: false,
+      id: "skills",
+      header: "Skills",
+      cell: ({ row }) => {
+        const employee = row.original;
+        const skills = employee.skills || [];
+        const [isModalOpen, setIsModalOpen] = useState(false);
+
+        return (
+          <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm" className="flex items-center gap-2">
+                <Wrench className="size-4" />
+                <Badge variant="secondary" className="px-2">{skills.length}</Badge>
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Skills for: {employee.last_name}</DialogTitle>
+                <DialogDescription>
+                  These are the skills associated with this employee.
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-3 pt-4">
+                {skills.map(skill => (
+                  <div key={skill.id} className="flex items-center justify-between p-3 border rounded-lg bg-muted/50">
+                    <div>
+                      <p className="font-semibold">{skill.name}</p>
+                    </div>
+                  </div>
+                ))}
+
+                {skills.length === 0 && (
+                  <p className="text-center text-muted-foreground py-4">
+                    No skills found for this employee.
+                  </p>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
+        );
+      },
+      enableSorting: false,
   },
   {
     accessorKey: "department",
