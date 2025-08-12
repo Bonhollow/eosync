@@ -96,7 +96,7 @@ export function TableCards() {
                 Export
               </Button>
               <Button size="sm" onClick={() => setOpenModal(true)}>
-                Add
+                Add Skills
               </Button>
             </div>
           </CardAction>

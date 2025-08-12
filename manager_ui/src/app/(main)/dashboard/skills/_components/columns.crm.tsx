@@ -1,10 +1,24 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { Trash } from "lucide-react";
-import { deleteSkill } from "../utils/api";
+import { Pen, Trash } from "lucide-react";
+import { useState } from "react";
+import { z } from "zod";
+
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { deleteSkill, editSkill } from "../utils/api"; // Make sure to create and import editSkill
 import { skillSchema } from "./schema";
-import { z } from "zod";
+
+// Define the type for the payload sent to the PUT endpoint for updating a skill.
+interface SkillUpdatePayload {
+  name?: string;
+}
 
 export const skillsColumns: ColumnDef<z.infer<typeof skillSchema>>[] = [
   {
@@ -22,17 +36,96 @@ export const skillsColumns: ColumnDef<z.infer<typeof skillSchema>>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => (
-      <Button
-        variant="ghost"
-        className="text-muted-foreground flex size-8"
-        size="icon"
-        onClick={() => deleteSkill(parseInt(row.original.id.toString()))}
-      >
-        <Trash />
-        <span className="sr-only">Delete</span>
-      </Button>
-    ),
+    cell: ({ row }) => {
+      const skill = row.original;
+      const [openEdit, setOpenEdit] = useState(false);
+      
+      const [formData, setFormData] = useState<SkillUpdatePayload>({
+        name: skill.name,
+      });
+
+      const onSave = async () => {
+        await editSkill(skill.id, { name: formData.name ?? "" });
+        setOpenEdit(false);
+
+        window.location.reload(); 
+      };
+
+      return (
+        <>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-muted-foreground"
+              onClick={() => {
+                setFormData({ name: skill.name });
+                setOpenEdit(true);
+              }}
+            >
+              <Pen className="size-4" />
+              <span className="sr-only">Edit</span>
+            </Button>
+            
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-muted-foreground"
+              onClick={() => deleteSkill(parseInt(skill.id.toString()))}
+            >
+              <Trash className="size-4" />
+              <span className="sr-only">Delete</span>
+            </Button>
+          </div>
+
+          <Dialog open={openEdit} onOpenChange={setOpenEdit}>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Edit Skill</DialogTitle>
+              </DialogHeader>
+
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  onSave();
+                }}
+              >
+                <div className="grid gap-4 py-4">
+                  <div>
+                    <label htmlFor="name" className="block text-xs font-bold mb-1">
+                      Skill Name *
+                    </label>
+                    <Input
+                      id="name"
+                      value={formData.name ?? ""}
+                      onChange={(e) =>
+                        setFormData({ ...formData, name: e.target.value })
+                      }
+                      required
+                      className="text-sm h-8"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-2 pt-2">
+                  <Button type="submit" size="sm">
+                    Save Changes
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setOpenEdit(false)}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </>
+      );
+    },
     enableSorting: false,
-  }
+  },
 ];

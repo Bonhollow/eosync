@@ -1,3 +1,5 @@
+"use client";
+
 import { TableCards } from "./_components/table-cards";
 
 export default function Page() {

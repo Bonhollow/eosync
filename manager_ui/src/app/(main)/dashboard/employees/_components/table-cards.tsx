@@ -1,14 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
+import { useEffect, useMemo, useState } from "react";
 import { 
   getEmployees, 
   createEmployee, 
   createEmployeesFromFile,
   getSkills
 } from "../utils/api";
-
 import { DataTable } from "@/components/data-table/data-table";
 import { DataTablePagination } from "@/components/data-table/data-table-pagination";
 import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
@@ -22,9 +20,9 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { useDataTableInstance } from "@/hooks/use-data-table-instance";
-
-import { employeesColumns } from "./columns.crm";
-
+import Select from 'react-select';
+// Importa la funzione invece della costante
+import { getEmployeesColumns } from "./columns.crm";
 import {
   Dialog,
   DialogContent,
@@ -33,21 +31,35 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-
 import { Input } from "@/components/ui/input";
-import { Employee, EmployeeCreate } from "./schema";
+// Import your schema definitions
+import { Employee } from "./schema";
+
+// Define the creation schema according to the new API format
+export interface EmployeeCreate {
+  first_name: string | null;
+  last_name: string;
+  birth_date: string | null;
+  email: string | null;
+  phone: string | null;
+  hire_date: string | null;
+  role: string;
+  department: string | null;
+  salary: number | null;
+  skill_ids: number[]; // <-- CHANGED: from 'skills' to 'skill_ids'
+}
+
 
 export function TableCards() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
-
   const [openModal, setOpenModal] = useState(false);
   const [manualMode, setManualMode] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [parsedEmployees, setParsedEmployees] = useState<Employee[]>([]);
 
-  const [manualEmployee, setManualEmployee] = useState<EmployeeCreate>({
+  const initialManualEmployeeState: EmployeeCreate = {
     first_name: null,
     last_name: "",
     birth_date: null,
@@ -57,10 +69,12 @@ export function TableCards() {
     role: "",
     department: null,
     salary: 0,
-    skills: [],
-  });
+    skill_ids: [],
+  };
 
-const [availableSkills, setAvailableSkills] = useState<{ id: string; name: string }[]>([]);
+  const [manualEmployee, setManualEmployee] = useState<EmployeeCreate>(initialManualEmployeeState);
+  
+  const [availableSkills, setAvailableSkills] = useState<{ id: number; name: string }[]>([]);
 
   useEffect(() => {
     getEmployees()
@@ -75,6 +89,40 @@ const [availableSkills, setAvailableSkills] = useState<{ id: string; name: strin
       .catch((e) => console.error("Error fetching skills:", e));
   }, []);
 
+  const skillOptions = availableSkills.map(skill => ({
+    value: skill.id,
+    label: skill.name
+  }));
+  
+  const employeesColumns = useMemo(() => getEmployeesColumns(skillOptions), [skillOptions]);
+
+
+  const customSelectStyles = {
+    control: (provided: any, state: any) => ({
+      ...provided,
+      minHeight: '32px',
+      height: 'auto', // Allow it to grow if many skills are selected
+      boxShadow: state.isFocused ? '0 0 0 1px #2563eb' : 'none',
+      borderColor: state.isFocused ? '#a5b4fc' : '#d1d5db',
+      ':hover': {
+        borderColor: '#9ca3af',
+      },
+    }),
+    valueContainer: (provided: any) => ({
+      ...provided,
+      minHeight: '32px',
+      padding: '0 6px'
+    }),
+    input: (provided: any) => ({
+      ...provided,
+      margin: '0px',
+    }),
+    indicatorsContainer: (provided: any) => ({
+      ...provided,
+      height: '32px',
+    }),
+  };
+
   const table = useDataTableInstance({
     data: employees,
     columns: employeesColumns,
@@ -88,31 +136,17 @@ const [availableSkills, setAvailableSkills] = useState<{ id: string; name: strin
     }
 
     try {
-      // Backend probabilmente aspetta un array, quindi:
       const res = await createEmployee([manualEmployee]);
       setEmployees((prev) => [...prev, ...res]);
       setOpenModal(false);
       setManualMode(false);
-      // Reset form
-      setManualEmployee({
-        first_name: "",
-        last_name: "",
-        birth_date: "",
-        email: "",
-        phone: "",
-        hire_date: "",
-        role: "",
-        department: "",
-        salary: 0,
-        skills: [],
-      });
+      setManualEmployee(initialManualEmployeeState);
     } catch (err) {
       console.error("Error saving employee:", err);
       alert("Error saving employee. Check console.");
     }
   };
 
-  // File upload handler (rimosso parse manuale perché non usi textarea)
   const handleFileUpload = async () => {
     if (!file) return;
     setUploading(true);
@@ -141,7 +175,7 @@ const [availableSkills, setAvailableSkills] = useState<{ id: string; name: strin
                 Export
               </Button>
               <Button size="sm" onClick={() => setOpenModal(true)}>
-                Add
+                Add Employees
               </Button>
             </div>
           </CardAction>
@@ -154,7 +188,6 @@ const [availableSkills, setAvailableSkills] = useState<{ id: string; name: strin
         </CardContent>
       </Card>
 
-      {/* Modal */}
       <Dialog open={openModal} onOpenChange={setOpenModal}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
@@ -186,13 +219,11 @@ const [availableSkills, setAvailableSkills] = useState<{ id: string; name: strin
             </div>
           )}
 
-          {/* Manual mode with compact form */}
           {manualMode && parsedEmployees.length === 0 && (
-            <form 
-              className="grid grid-cols-1 md:grid-cols-2 gap-3 gap-y-4" 
+            <form
+              className="grid grid-cols-1 md:grid-cols-2 gap-3 gap-y-4"
               onSubmit={(e) => { e.preventDefault(); handleSaveManual(); }}
             >
-              {/* First Name - Optional */}
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="first_name">
                   First Name <span className="text-xs text-gray-400">(optional)</span>
@@ -206,7 +237,6 @@ const [availableSkills, setAvailableSkills] = useState<{ id: string; name: strin
                 />
               </div>
 
-              {/* Last Name - Required */}
               <div>
                 <label className="block text-xs font-bold text-gray-900 mb-1" htmlFor="last_name">
                   Last Name <span className="text-red-500">*</span>
@@ -221,7 +251,6 @@ const [availableSkills, setAvailableSkills] = useState<{ id: string; name: strin
                 />
               </div>
 
-              {/* Birth Date - Optional */}
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="birth_date">
                   Birth Date <span className="text-xs text-gray-400">(optional)</span>
@@ -235,7 +264,6 @@ const [availableSkills, setAvailableSkills] = useState<{ id: string; name: strin
                 />
               </div>
 
-              {/* Email - Optional */}
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="email">
                   Email <span className="text-xs text-gray-400">(optional)</span>
@@ -250,7 +278,6 @@ const [availableSkills, setAvailableSkills] = useState<{ id: string; name: strin
                 />
               </div>
 
-              {/* Phone - Optional */}
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="phone">
                   Phone <span className="text-xs text-gray-400">(optional)</span>
@@ -264,7 +291,6 @@ const [availableSkills, setAvailableSkills] = useState<{ id: string; name: strin
                 />
               </div>
 
-              {/* Hire Date - Optional */}
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="hire_date">
                   Hire Date <span className="text-xs text-gray-400">(optional)</span>
@@ -278,7 +304,6 @@ const [availableSkills, setAvailableSkills] = useState<{ id: string; name: strin
                 />
               </div>
 
-              {/* Role - Required */}
               <div>
                 <label className="block text-xs font-bold text-gray-900 mb-1" htmlFor="role">
                   Role <span className="text-red-500">*</span>
@@ -293,7 +318,6 @@ const [availableSkills, setAvailableSkills] = useState<{ id: string; name: strin
                 />
               </div>
 
-              {/* Department - Optional */}
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="department">
                   Department <span className="text-xs text-gray-400">(optional)</span>
@@ -307,7 +331,6 @@ const [availableSkills, setAvailableSkills] = useState<{ id: string; name: strin
                 />
               </div>
 
-              {/* Salary - Full width on all screens */}
               <div className="md:col-span-2">
                 <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="salary">
                   Salary <span className="text-xs text-gray-400">(optional)</span>
@@ -320,13 +343,36 @@ const [availableSkills, setAvailableSkills] = useState<{ id: string; name: strin
                   value={manualEmployee.salary ?? ""}
                   onChange={(e) => {
                     const val = e.target.value;
-                    setManualEmployee(prev => ({ ...prev, salary: val === "" ? 0 : parseFloat(val) }));
+                    setManualEmployee(prev => ({ ...prev, salary: val === "" ? null : parseFloat(val) }));
                   }}
                   className="text-sm h-8 max-w-xs"
                 />
               </div>
 
-              {/* Required fields info - Full width */}
+              <div className="md:col-span-2">
+                <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="key-skills">
+                  Key Skills <span className="text-xs text-gray-400">(optional)</span>
+                </label>
+                <Select
+                  id="key-skills"
+                  instanceId="key-skills"
+                  isMulti
+                  options={skillOptions}
+                  value={skillOptions.filter(option => 
+                    manualEmployee.skill_ids.includes(option.value)
+                  )}
+                  onChange={(selectedOptions) => {
+                    setManualEmployee(prev => ({
+                      ...prev,
+                      skill_ids: selectedOptions ? selectedOptions.map(opt => Number(opt.value)) : [],
+                    }));
+                  }}
+                  styles={customSelectStyles}
+                  className="text-sm max-w-xs"
+                  placeholder="Select skills..."
+                />
+              </div>
+
               <div className="md:col-span-2 bg-red-50 border border-red-200 rounded p-2 text-xs text-red-700">
                 <span className="font-medium">*</span> Required fields
               </div>
@@ -339,8 +385,6 @@ const [availableSkills, setAvailableSkills] = useState<{ id: string; name: strin
             </form>
           )}
 
-
-          {/* Parsed employees from file upload */}
           {parsedEmployees.length > 0 && (
             <div className="flex flex-col gap-4">
               <p className="font-semibold">Employees detected:</p>

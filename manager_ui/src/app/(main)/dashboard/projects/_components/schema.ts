@@ -1,10 +1,41 @@
-import z from "zod";
+import { z } from "zod";
 
-export const recentLeadSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  company: z.string(),
-  status: z.string(),
-  source: z.string(),
-  lastActivity: z.string(),
+export const taskStatusEnum = z.enum([
+  "To Do",
+  "In Progress",
+  "Done",
+]);
+
+export const taskSchema = z.object({
+  id: z.number(),
+  project_id: z.number(),
+  title: z.string().min(1, { message: "Title is required" }),
+  description: z.string().optional().nullable(),
+  start_date: z.string().min(1, { message: "Start date is required" }),
+  end_date: z.string().optional().nullable(),
+  estimated_hours: z.coerce.number().optional().nullable(),
+  status: taskStatusEnum.optional().nullable().default("To Do"),
 });
+
+
+export const projectSchema = z.object({
+  id: z.number(),
+  title: z.string().min(1, "Title is required"),
+  description: z.string().optional().nullable(),
+  start_date: z.string().min(1, "Start date is required"),
+  end_date: z.string().optional().nullable(),
+  budget_total: z.coerce.number().min(0, "Budget must be a positive number"),
+  tasks: z.array(taskSchema).optional().default([]),
+});
+
+export const newProjectPayloadSchema = projectSchema.omit({ id: true, tasks: true }).extend({
+  tasks: z.array(taskSchema.omit({ id: true, project_id: true })).optional(),
+});
+export const newTaskPayloadSchema = taskSchema.omit({ id: true });
+
+
+export type Project = z.infer<typeof projectSchema>;
+export type Task = z.infer<typeof taskSchema>;
+
+export type NewProjectPayload = z.infer<typeof newProjectPayloadSchema>;
+export type NewTaskPayload = z.infer<typeof newTaskPayloadSchema>;

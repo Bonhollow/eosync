@@ -14,9 +14,32 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import Select from 'react-select';
+import { customStyles } from "../utils/customStyles";
 
+// Define the type for the payload sent to the PUT endpoint.
+// It must match the backend's EmployeeUpdate schema.
+interface EmployeeUpdatePayload {
+  first_name?: string | null;
+  last_name?: string;
+  birth_date?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  hire_date?: string | null;
+  role?: string;
+  department?: string | null;
+  salary?: number | null;
+  skill_ids?: number[]; // <-- The important change
+}
 
-export const employeesColumns: ColumnDef<Employee>[] = [
+// Ensure the SkillOption value is a number to match the skill ID type.
+type SkillOption = {
+  value: number; // <-- CHANGED from string to number
+  label: string;
+};
+
+// This function now generates the columns for the employee data table.
+export const getEmployeesColumns = (skillOptions: SkillOption[]): ColumnDef<Employee>[] => [
   {
     accessorKey: "first_name",
     header: ({ column }) => <DataTableColumnHeader column={column} title="First Name" />,
@@ -63,8 +86,10 @@ export const employeesColumns: ColumnDef<Employee>[] = [
     accessorKey: "skills",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Skills" />,
     cell: ({ row }) => (
-      <span>
-        {row.original.skills ? row.original.skills.toString() : "-"}
+      <span className="whitespace-nowrap">
+        {row.original.skills && row.original.skills.length > 0 
+          ? row.original.skills.map(skill => skill.name).join(', ') 
+          : "-"}
       </span>
     ),
     enableSorting: false,
@@ -87,15 +112,27 @@ export const employeesColumns: ColumnDef<Employee>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => {
+    cell: ({ row, table }) => { // <-- Destructure 'table' to access meta
       const employee: Employee = row.original;
       const [openEdit, setOpenEdit] = useState(false);
-      const [formData, setFormData] = useState<Employee>({ ...employee });
+      
+      // ** CHANGED **: Initialize form state by mapping skills to skill_ids
+      const [formData, setFormData] = useState({
+        ...employee,
+        skill_ids: employee.skills ? employee.skills.map(skill => skill.id) : [],
+      });
 
       const onSave = async () => {
-        await editEmployee(employee.id, formData);
+        // ** CHANGED **: Create the payload by excluding non-updatable fields
+        const { id, skills, ...payload } = formData;
+        
+        await editEmployee(employee.id, payload as EmployeeUpdatePayload);
         setOpenEdit(false);
-        // Puoi aggiungere callback per refresh esterno se serve
+
+        // To see changes, you need to refresh the table's data.
+        // The recommended way is to use a function passed via table.meta.
+        // Example: (table.meta as any)?.refreshData?.();
+        // A simpler but less ideal way: window.location.reload();
       };
 
       return (
@@ -105,19 +142,26 @@ export const employeesColumns: ColumnDef<Employee>[] = [
               variant="ghost"
               size="icon"
               className="text-muted-foreground"
-              onClick={() => deleteEmployee(employee.id)}
+              onClick={() => {
+                // Re-initialize form data every time the dialog opens to ensure it's fresh
+                setFormData({
+                    ...employee,
+                    skill_ids: employee.skills ? employee.skills.map(skill => skill.id) : [],
+                });
+                setOpenEdit(true);
+              }}
             >
-              <Trash />
-              <span className="sr-only">Delete</span>
+              <Pen className="size-4" />
+              <span className="sr-only">Edit</span>
             </Button>
             <Button
               variant="ghost"
               size="icon"
               className="text-muted-foreground"
-              onClick={() => setOpenEdit(true)}
+              onClick={() => deleteEmployee(employee.id)}
             >
-              <Pen />
-              <span className="sr-only">Edit</span>
+              <Trash className="size-4" />
+              <span className="sr-only">Delete</span>
             </Button>
           </div>
 
@@ -134,6 +178,7 @@ export const employeesColumns: ColumnDef<Employee>[] = [
                   onSave();
                 }}
               >
+                {/* --- Input fields (no changes here) --- */}
                 <div>
                   <label htmlFor="first_name" className="block text-xs font-medium mb-1">
                     First Name
@@ -160,7 +205,7 @@ export const employeesColumns: ColumnDef<Employee>[] = [
 
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="birth_date">
-                    Birth Date <span className="text-xs text-gray-400">(optional)</span>
+                    Birth Date
                   </label>
                   <Input
                     id="birth_date"
@@ -173,7 +218,7 @@ export const employeesColumns: ColumnDef<Employee>[] = [
 
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="email">
-                    Email <span className="text-xs text-gray-400">(optional)</span>
+                    Email
                   </label>
                   <Input
                     id="email"
@@ -187,7 +232,7 @@ export const employeesColumns: ColumnDef<Employee>[] = [
 
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="phone">
-                    Phone <span className="text-xs text-gray-400">(optional)</span>
+                    Phone
                   </label>
                   <Input
                     id="phone"
@@ -200,7 +245,7 @@ export const employeesColumns: ColumnDef<Employee>[] = [
 
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="hire_date">
-                    Hire Date <span className="text-xs text-gray-400">(optional)</span>
+                    Hire Date
                   </label>
                   <Input
                     id="hire_date"
@@ -213,7 +258,7 @@ export const employeesColumns: ColumnDef<Employee>[] = [
 
                 <div>
                   <label className="block text-xs font-bold text-gray-900 mb-1" htmlFor="role">
-                    Role <span className="text-red-500">*</span>
+                    Role *
                   </label>
                   <Input
                     id="role"
@@ -227,7 +272,7 @@ export const employeesColumns: ColumnDef<Employee>[] = [
 
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="department">
-                    Department <span className="text-xs text-gray-400">(optional)</span>
+                    Department
                   </label>
                   <Input
                     id="department"
@@ -240,7 +285,7 @@ export const employeesColumns: ColumnDef<Employee>[] = [
 
                 <div className="md:col-span-2">
                   <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="salary">
-                    Salary <span className="text-xs text-gray-400">(optional)</span>
+                    Salary
                   </label>
                   <Input
                     id="salary"
@@ -250,17 +295,45 @@ export const employeesColumns: ColumnDef<Employee>[] = [
                     value={formData.salary ?? ""}
                     onChange={(e) => {
                       const val = e.target.value;
-                      setFormData(formData => ({ ...formData, salary: val === "" ? 0 : parseFloat(val) }));
+                      setFormData(formData => ({ ...formData, salary: val === "" ? null : parseFloat(val) }));
                     }}
                     className="text-sm h-8 max-w-xs"
+                  />
+                </div>
+                
+                {/* --- Skills Section (Updated) --- */}
+                <div className="md:col-span-2">
+                  <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="skills">
+                    Skills
+                  </label>
+                  <Select
+                    id="skills"
+                    instanceId="skills"
+                    isMulti
+                    options={skillOptions}
+                    // ** CHANGED **: Value prop now filters options based on skill_ids
+                    value={skillOptions.filter(option => 
+                      formData.skill_ids.includes(option.value)
+                    )}
+                    // ** CHANGED **: onChange now updates the skill_ids array
+                    onChange={(selectedOptions) => {
+                      setFormData(prev => ({
+                        ...prev,
+                        skill_ids: selectedOptions ? selectedOptions.map(opt => opt.value) : [],
+                      }));
+                    }}
+                    styles={customStyles}
+                    className="text-sm max-w-xs"
+                    placeholder="Select skills..."
                   />
                 </div>
 
                 <div className="md:col-span-2 flex justify-end gap-2 pt-2">
                   <Button type="submit" size="sm">
-                    Save
+                    Save Changes
                   </Button>
                   <Button
+                    type="button" // Important: Prevent form submission
                     variant="ghost"
                     size="sm"
                     onClick={() => setOpenEdit(false)}
@@ -268,7 +341,6 @@ export const employeesColumns: ColumnDef<Employee>[] = [
                     Cancel
                   </Button>
                 </div>
-
               </form>
             </DialogContent>
           </Dialog>

@@ -1,6 +1,7 @@
 from datetime import date
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel
+from .task import Task as TaskSchema
 
 class ProjectBase(BaseModel):
     title: str
@@ -14,5 +15,7 @@ class ProjectCreate(ProjectBase):
 
 class Project(ProjectBase):
     id: int
+    tasks: List[TaskSchema] = []
+
     class Config:
         from_attributes = True

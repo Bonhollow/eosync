@@ -10,6 +10,11 @@ export async function createSkill(skills: string[]) {
     return response.data;
 }
 
+export async function editSkill(id: number, payload: {name: string}) {
+    const response = await axios.put(`http://localhost:8000/skills/${id}`, payload);
+    return response.data;
+}
+
 export async function createSkillsFromFile(file: File) {
     const response = await axios.post("http://localhost:8000/skills", { file });
     return response.data;

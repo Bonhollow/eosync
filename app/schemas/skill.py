@@ -6,6 +6,9 @@ class SkillBase(BaseModel):
 class SkillCreate(SkillBase):
     pass
 
+class SkillUpdate(BaseModel):
+    name: str
+    
 class Skill(SkillBase):
     id: int
     class Config:

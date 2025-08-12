@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from typing import List
 from core.database import get_db
 from models.project import Project as ProjectModel
@@ -17,22 +17,25 @@ def create_project(proj: ProjectCreate, db: Session = Depends(get_db)):
 
 @router.get("/", response_model=List[ProjectSchema])
 def read_projects(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    return db.query(ProjectModel).offset(skip).limit(limit).all()
+    query = db.query(ProjectModel).options(joinedload(ProjectModel.tasks))
+    return query.offset(skip).limit(limit).all()
 
 @router.get("/{project_id}", response_model=ProjectSchema)
 def read_project(project_id: int, db: Session = Depends(get_db)):
-    proj = db.query(ProjectModel).get(project_id)
+    proj = db.query(ProjectModel).options(joinedload(ProjectModel.tasks)).get(project_id)
     if not proj:
         raise HTTPException(status_code=404, detail="Project not found")
     return proj
 
 @router.put("/{project_id}", response_model=ProjectSchema)
 def update_project(project_id: int, proj_update: ProjectCreate, db: Session = Depends(get_db)):
-    proj = db.query(ProjectModel).get(project_id)
+    proj = db.query(ProjectModel).options(joinedload(ProjectModel.tasks)).get(project_id)
     if not proj:
         raise HTTPException(status_code=404, detail="Project not found")
-    for key, value in proj_update.dict(exclude_unset=True).items():
+    
+    for key, value in proj_update.model_dump(exclude_unset=True).items():
         setattr(proj, key, value)
+        
     db.commit()
     db.refresh(proj)
     return proj
