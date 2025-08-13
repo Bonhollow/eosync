@@ -1,7 +1,8 @@
 from datetime import date
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel
 from models.task import TaskStatus
+from schemas.assignment import Assignment
 
 class TaskBase(BaseModel):
     project_id: int
@@ -17,5 +18,7 @@ class TaskCreate(TaskBase):
 
 class Task(TaskBase):
     id: int
+    assignments: List[Assignment] = []
+
     class Config:
         from_attributes = True

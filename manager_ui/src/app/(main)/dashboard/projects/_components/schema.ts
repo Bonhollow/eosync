@@ -6,6 +6,20 @@ export const taskStatusEnum = z.enum([
   "Done",
 ]);
 
+export const employeeSchema = z.object({
+  id: z.number(),
+  last_name: z.string(),
+  role: z.string().email(),
+});
+
+export const assignmentSchema = z.object({
+  employee_id: z.number(),
+  task_id: z.number(),
+  assigned_hours: z.coerce.number().optional().nullable(),
+  role_on_task: z.string().optional().nullable(),
+  employee: employeeSchema,
+});
+
 export const taskSchema = z.object({
   id: z.number(),
   project_id: z.number(),
@@ -15,8 +29,8 @@ export const taskSchema = z.object({
   end_date: z.string().optional().nullable(),
   estimated_hours: z.coerce.number().optional().nullable(),
   status: taskStatusEnum.optional().nullable().default("To Do"),
+  assignments: z.array(assignmentSchema).optional().default([]),
 });
-
 
 export const projectSchema = z.object({
   id: z.number(),
@@ -31,11 +45,16 @@ export const projectSchema = z.object({
 export const newProjectPayloadSchema = projectSchema.omit({ id: true, tasks: true }).extend({
   tasks: z.array(taskSchema.omit({ id: true, project_id: true })).optional(),
 });
-export const newTaskPayloadSchema = taskSchema.omit({ id: true });
 
+export const newTaskPayloadSchema = taskSchema.omit({ id: true, assignments: true });
+
+export const newAssignmentPayloadSchema = assignmentSchema.omit({ employee: true });
 
 export type Project = z.infer<typeof projectSchema>;
 export type Task = z.infer<typeof taskSchema>;
+export type Employee = z.infer<typeof employeeSchema>;
+export type Assignment = z.infer<typeof assignmentSchema>;
 
 export type NewProjectPayload = z.infer<typeof newProjectPayloadSchema>;
 export type NewTaskPayload = z.infer<typeof newTaskPayloadSchema>;
+export type NewAssignmentPayload = z.infer<typeof newAssignmentPayloadSchema>;

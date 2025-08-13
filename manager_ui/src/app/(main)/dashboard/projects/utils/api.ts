@@ -1,5 +1,12 @@
 import axios from 'axios';
-import { Project, NewProjectPayload, Task, NewTaskPayload } from "../_components/schema";
+import {
+    Project,
+    NewProjectPayload,
+    Task,
+    NewTaskPayload,
+    Assignment,
+    NewAssignmentPayload
+} from "../_components/schema";
 
 const apiClient = axios.create({
     baseURL: 'http://localhost:8000',
@@ -39,4 +46,28 @@ export async function updateTask(taskId: number, taskData: Partial<NewTaskPayloa
 
 export async function deleteTask(taskId: number): Promise<void> {
     await apiClient.delete(`/tasks/${taskId}/`);
+}
+
+export async function getAssignments(): Promise<Assignment[]> {
+    const response = await apiClient.get<Assignment[]>('/assignments/');
+    return response.data;
+}
+
+export async function createAssignment(assignmentData: NewAssignmentPayload): Promise<Assignment> {
+    const response = await apiClient.post<Assignment>('/assignments/', assignmentData);
+    return response.data;
+}
+
+export async function deleteAssignment(employeeId: number, taskId: number): Promise<void> {
+    await apiClient.delete('/assignments/', {
+        params: {
+            employee_id: employeeId,
+            task_id: taskId
+        }
+    });
+}
+
+export async function getEmployees() {
+    const response = await apiClient.get('/employees/');
+    return response.data;
 }

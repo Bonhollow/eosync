@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
+from schemas.employee import Employee
 
 class AssignmentBase(BaseModel):
     employee_id: int
@@ -11,5 +12,7 @@ class AssignmentCreate(AssignmentBase):
     pass
 
 class Assignment(AssignmentBase):
+    employee: Employee
+
     class Config:
         from_attributes = True

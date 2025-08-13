@@ -167,21 +167,23 @@ export function TableCards() {
         estimated_hours: Number(taskFormData.estimated_hours) || 0,
     };
 
-    const updatedTasks =
-      editingTaskIndex !== null
-        ? currentTasks.map((task, i) =>
-            i === editingTaskIndex
-              ? { ...task, ...taskToSave }
-              : task
-          )
-        : [
-            ...currentTasks,
-            {
-              ...taskToSave,
-              status: "To Do" as "To Do" | "In Progress" | "Done" | null,
-            },
-          ];
-
+  const updatedTasks: NonNullable<NewProjectPayload["tasks"]> =
+    editingTaskIndex !== null
+      ? currentTasks.map((task, i) =>
+          i === editingTaskIndex
+            ? { ...task, ...taskToSave, assignments: task.assignments ?? [] }
+            : task
+        )
+      : [
+          ...currentTasks,
+          {
+            ...taskToSave,
+            status: "To Do",
+            assignments: [],
+          },
+        ];
+    
+          
     setNewProject(prev => ({ ...prev, tasks: updatedTasks }));
     closeTaskModal();
   };
