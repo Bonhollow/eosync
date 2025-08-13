@@ -2,19 +2,28 @@ from datetime import date
 from typing import Optional
 from pydantic import BaseModel
 from models.leave import LeaveType
+from .employee import Employee
 
 class LeaveBase(BaseModel):
-    employee_id: int
     type: LeaveType
     start_date: date
     end_date: date
-    approved: Optional[bool] = False
     reason: Optional[str]
 
 class LeaveCreate(LeaveBase):
-    pass
+    employee_id: int
+
+class LeaveUpdate(BaseModel):
+    type: Optional[LeaveType] = None
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
+    approved: Optional[bool] = None
+    reason: Optional[str] = None
 
 class Leave(LeaveBase):
     id: int
+    approved: bool
+    employee: Employee
+
     class Config:
         from_attributes = True

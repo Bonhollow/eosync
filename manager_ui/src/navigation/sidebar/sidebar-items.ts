@@ -5,6 +5,7 @@ import {
   Users,
   SquareKanban,
   Wrench,
+  DoorOpen,
   type LucideIcon,
 } from "lucide-react";
 
@@ -47,6 +48,11 @@ export const sidebarItems: NavGroup[] = [
         title: "Employees",
         url: "/dashboard/employees",
         icon: Users,
+      },
+      {
+        title: "Leaves",
+        url: "/dashboard/leaves",
+        icon: DoorOpen,
       },
       {
         title: "Projects",
