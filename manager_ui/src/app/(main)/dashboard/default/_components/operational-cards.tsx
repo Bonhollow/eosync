@@ -4,14 +4,43 @@ import { AlertTriangle, Clock } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter, CardDescription } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import type { TaskPerformance, ProjectHealth } from "../utils/types";
+import { Pie, PieChart } from "recharts";
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartConfig } from "@/components/ui/chart";
+
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#AF19FF"];
 
 interface OperationalCardsProps {
     taskData: TaskPerformance;
     projectData: ProjectHealth;
+    taskPerformance: TaskPerformance;
 }
 
-export function OperationalCards({ taskData, projectData }: OperationalCardsProps) {
+const ChartLegendContent = ({ payload }: any) => {
+  if (!payload) return null;
+  return (
+    <ul className="flex flex-col gap-3 text-sm text-muted-foreground">
+      {payload.map((entry: any) => (
+        <li key={`item-${entry.value}`} className="flex items-center gap-2 font-medium capitalize leading-none">
+          <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: entry.color }} />
+          {entry.value.replace("_", " ")}
+        </li>
+      ))}
+    </ul>
+  );
+};
+
+export function OperationalCards({ taskData, projectData, taskPerformance }: OperationalCardsProps) {
   const projectsWithProgress = projectData.projects_summary.filter(p => p.progress_percentage > 0);
+
+  const taskStatusData = taskPerformance.task_status_breakdown.map((d, i) => ({
+    ...d,
+    fill: COLORS[i % COLORS.length],
+  }));
+
+  const taskStatusChartConfig = taskStatusData.reduce((acc, cur) => {
+    acc[cur.status] = { label: cur.status.replace("_", " "), color: cur.fill };
+    return acc;
+  }, {} as ChartConfig);
 
   return (
     <div className="grid grid-cols-1 gap-4 *:data-[slot=card]:shadow-xs sm:grid-cols-2 xl:grid-cols-3">
@@ -44,7 +73,7 @@ export function OperationalCards({ taskData, projectData }: OperationalCardsProp
         </CardFooter>
       </Card>
 
-      <Card className="sm:col-span-2">
+      <Card>
         <CardHeader>
           <CardTitle>Overdue Tasks</CardTitle>
           <CardDescription>
@@ -53,7 +82,7 @@ export function OperationalCards({ taskData, projectData }: OperationalCardsProp
         </CardHeader>
         <CardContent>
           <ul className="space-y-2.5">
-            {taskData.overdue_tasks_list.slice(0, 5).map((item) => ( // Show top 5
+            {taskData.overdue_tasks_list.slice(0, 5).map((item) => (
               <li key={item.id} className="space-y-1 rounded-md border px-3 py-2">
                 <div className="flex items-center gap-2">
                     <AlertTriangle className="text-destructive size-4" />
@@ -70,6 +99,26 @@ export function OperationalCards({ taskData, projectData }: OperationalCardsProp
               </li>
             ))}
           </ul>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Tasks by Status</CardTitle>
+        </CardHeader>
+        <CardContent className="flex items-center justify-center h-full min-h-48">
+          <ChartContainer config={taskStatusChartConfig} className="mx-auto aspect-square w-full max-w-[250px]">
+            <PieChart>
+              <ChartTooltip content={<ChartTooltipContent nameKey="status" hideLabel />} />
+              <Pie data={taskStatusData} dataKey="count" nameKey="status" innerRadius={50} />
+              <ChartLegend
+                content={<ChartLegendContent />}
+                layout="vertical"
+                verticalAlign="middle"
+                align="right"
+              />
+            </PieChart>
+          </ChartContainer>
         </CardContent>
       </Card>
     </div>

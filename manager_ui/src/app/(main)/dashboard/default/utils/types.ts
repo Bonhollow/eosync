@@ -75,3 +75,23 @@ export interface DashboardAnalytics {
     task_performance: TaskPerformance;
     employee_assignments: EmployeeAssignments;
 }
+
+export interface ScheduleTaskInfo {
+    task_id: number;
+    task_title: string;
+    project_id: number;
+    project_title: string;
+}
+
+export interface EmployeeSchedule {
+    employee_id: number;
+    full_name: string;
+    role: string | null;
+    schedule: Record<string, ScheduleTaskInfo[]>;
+}
+
+export interface WeeklyScheduleResponse {
+    start_of_week: string; 
+    end_of_week: string;   
+    employees: EmployeeSchedule[];
+}

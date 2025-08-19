@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Dict
 from datetime import date
 from pydantic import BaseModel
 
@@ -71,3 +71,20 @@ class DashboardAnalytics(BaseModel):
     resource_management: ResourceManagementAnalytics
     task_performance: TaskPerformanceAnalytics
     employee_assignments: EmployeeAssignmentsAnalytics
+    
+class ScheduleTaskInfo(BaseModel):
+    task_id: int
+    task_title: str
+    project_id: int
+    project_title: str
+
+class EmployeeScheduleSchema(BaseModel):
+    employee_id: int
+    full_name: str
+    role: Optional[str]
+    schedule: Dict[str, List[ScheduleTaskInfo]]
+
+class WeeklyScheduleResponse(BaseModel):
+    start_of_week: date
+    end_of_week: date
+    employees: List[EmployeeScheduleSchema]

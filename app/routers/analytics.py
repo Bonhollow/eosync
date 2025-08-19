@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func
-from datetime import date
+from datetime import date, timedelta
+from typing import Dict, Optional
 from core.database import get_db
-
 from models.project import Project as ProjectModel
 from models.task import Task as TaskModel, TaskStatus
 from models.employee import Employee as EmployeeModel
@@ -13,7 +13,8 @@ from schemas.analytics import (
     ProjectSummarySchema, ProjectHealthAnalytics, ResourceManagementAnalytics,
     EmployeeWorkload, DepartmentAllocation, TaskStatusDistribution, OverdueTask,
     TaskPerformanceAnalytics, EmployeeAssignmentDetails, ProjectAssignmentInfo,
-    EmployeeAssignmentsAnalytics, DashboardAnalytics
+    EmployeeAssignmentsAnalytics, DashboardAnalytics, WeeklyScheduleResponse,
+    EmployeeScheduleSchema, ScheduleTaskInfo
 )
 
 router = APIRouter()
@@ -162,4 +163,63 @@ def get_dashboard_analytics(db: Session = Depends(get_db)):
         resource_management=resource_management_data,
         task_performance=task_performance_data,
         employee_assignments=employee_assignments_data
+    )
+
+@router.get("/employee-schedule", response_model=WeeklyScheduleResponse)
+def get_employee_schedule(view_date: Optional[date] = None, db: Session = Depends(get_db)):
+    if view_date is None:
+        view_date = date.today()
+
+    start_of_week = view_date - timedelta(days=view_date.weekday())
+    end_of_week = start_of_week + timedelta(days=6)
+
+    assignments_in_week = db.query(AssignmentModel).options(
+        joinedload(AssignmentModel.employee),
+        joinedload(AssignmentModel.task).joinedload(TaskModel.project)
+    ).join(AssignmentModel.task).filter(
+        TaskModel.start_date <= end_of_week,
+        TaskModel.end_date >= start_of_week
+    ).all()
+
+    employee_schedules_map: Dict[int, EmployeeScheduleSchema] = {}
+
+    for assignment in assignments_in_week:
+        employee = assignment.employee
+        task = assignment.task
+        project = task.project
+        
+        if not employee or not task or not project:
+            continue
+
+        if employee.id not in employee_schedules_map:
+            employee_schedules_map[employee.id] = EmployeeScheduleSchema(
+                employee_id=employee.id,
+                full_name=f"{employee.first_name or ''} {employee.last_name}".strip(),
+                role=employee.role,
+                schedule={}
+            )
+        
+        for i in range(7):
+            current_day = start_of_week + timedelta(days=i)
+            
+            if task.start_date <= current_day <= task.end_date:
+                date_str = current_day.isoformat()
+                
+                if date_str not in employee_schedules_map[employee.id].schedule:
+                    employee_schedules_map[employee.id].schedule[date_str] = []
+                
+                task_info = ScheduleTaskInfo(
+                    task_id=task.id,
+                    task_title=task.title,
+                    project_id=project.id,
+                    project_title=project.title
+                )
+                
+                if not any(t.task_id == task.id for t in employee_schedules_map[employee.id].schedule[date_str]):
+                    employee_schedules_map[employee.id].schedule[date_str].append(task_info)
+
+    return WeeklyScheduleResponse(
+        start_of_week=start_of_week,
+        end_of_week=end_of_week,
+        employees=list(employee_schedules_map.values())
     )
