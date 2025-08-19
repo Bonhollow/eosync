@@ -1,7 +1,6 @@
 import {
   LayoutDashboard,
   ChartBar,
-  Banknote,
   Users,
   SquareKanban,
   Wrench,
@@ -68,11 +67,6 @@ export const sidebarItems: NavGroup[] = [
         title: "CRM",
         url: "/dashboard/crm",
         icon: ChartBar,
-      },
-      {
-        title: "Finance",
-        url: "/dashboard/finance",
-        icon: Banknote,
       }
     ],
   }

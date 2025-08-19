@@ -15,7 +15,7 @@ import {
   CardAction
 } from "@/components/ui/card";
 import { useDataTableInstance } from "@/hooks/use-data-table-instance";
-import { getLeaveColumns } from "./columns.crm";
+import { getLeaveColumns } from "./columns.leave";
 import {
   Dialog,
   DialogContent,

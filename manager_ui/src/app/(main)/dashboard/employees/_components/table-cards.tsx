@@ -22,7 +22,7 @@ import {
 import { useDataTableInstance } from "@/hooks/use-data-table-instance";
 import Select from 'react-select';
 // Importa la funzione invece della costante
-import { getEmployeesColumns } from "./columns.crm";
+import { getEmployeesColumns } from "./columns.employee";
 import {
   Dialog,
   DialogContent,

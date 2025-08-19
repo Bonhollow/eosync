@@ -35,7 +35,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useDataTableInstance } from "@/hooks/use-data-table-instance";
 import { PlusCircle, Pen, Trash } from "lucide-react";
-import { getProjectsColumns } from "./columns.crm";
+import { getProjectsColumns } from "./columns.project";
 
 type TaskFormData = Omit<NewTaskPayload, "project_id" | "status">;
 

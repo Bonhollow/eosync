@@ -450,7 +450,7 @@ export const getProjectsColumns = ({ onDelete }: { onDelete: (project: Project) 
     {
         accessorKey: "budget_total",
         header: ({ column }) => <DataTableColumnHeader column={column} title="Budget" />,
-        cell: ({ row }) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(parseFloat(row.getValue("budget_total"))),
+        cell: ({ row }) => row.getValue("budget_total") ? new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(parseFloat(row.getValue("budget_total"))) : "-",
     },
     {
         id: "actions",

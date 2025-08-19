@@ -14,7 +14,7 @@ import {
   CardAction
 } from "@/components/ui/card";
 import { useDataTableInstance } from "@/hooks/use-data-table-instance";
-import { skillsColumns } from "./columns.crm";
+import { skillsColumns } from "./columns.skill";
 import {
   Dialog,
   DialogContent,
