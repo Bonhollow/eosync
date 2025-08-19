@@ -6,6 +6,8 @@ from docling.document_converter import DocumentConverter
 from agents.skill_agent import agent as skill_agent
 from agents.employee_agent import agent as employee_agent
 from agents.project_agent import agent as project_agent
+from agents.employee_assign_agent import agent as assignment_agent
+from models.assignment import Assignment as AssignmentModel
 from core.database import get_db
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
@@ -248,3 +250,42 @@ async def elaborate_projects(query: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Project not found after creation")
 
     return db_project
+
+@router.post("/generate/generate-assignments/{project_id}/", response_model=ProjectSchema)
+async def assign_employees_to_project(project_id: int, db: Session = Depends(get_db)):
+    project = db.query(ProjectModel).filter(ProjectModel.id == project_id).first()
+    if not project:
+        raise HTTPException(status_code=404, detail="Progetto non trovato")
+
+    tasks = db.query(TaskModel).filter(TaskModel.project_id == project_id).all()
+    employees = db.query(EmployeeModel).all()
+
+    if not tasks or not employees:
+        raise HTTPException(status_code=400, detail="Progetto senza task o dipendenti disponibili")
+
+    project_context = {
+        "project": {"id": project.id, "title": project.title, "description": project.description},
+        "tasks": [{"id": t.id, "title": t.title, "description": t.description} for t in tasks],
+        "employees": [{"id": e.id, "last_name": e.last_name, "email": e.email, "skills": e.skills} for e in employees],
+    }
+
+    context = json.dumps(project_context, indent=2)
+
+    result = assignment_agent.run(context)
+
+    assignment_list = result.content
+
+    for assignment in assignment_list.assignments:
+        new_assignment = AssignmentModel(
+            employee_id=assignment.employee_id,
+            task_id=assignment.task_id,
+            role_on_task=assignment.role_on_task,
+            assigned_hours=assignment.assigned_hours,
+        )
+        print(f"Adding assignment: {new_assignment}")
+        db.add(new_assignment)
+
+    db.commit()
+    db.refresh(project)
+
+    return project

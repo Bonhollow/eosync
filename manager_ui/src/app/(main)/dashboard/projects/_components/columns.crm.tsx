@@ -1,7 +1,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { ListChecks, Pen, Plus, Trash, Users } from "lucide-react";
+import { ListChecks, Pen, Plus, Trash, Users, Bot } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
     createAssignment,
@@ -11,6 +11,7 @@ import {
     editProject,
     getEmployees,
     updateTask,
+    automateTaskAssignment
 } from "../utils/api";
 import { Assignment, Employee, NewAssignmentPayload, Project, Task } from "./schema";
 
@@ -344,7 +345,7 @@ export const getProjectsColumns = ({ onDelete }: { onDelete: (project: Project) 
                     <Dialog open={isModalOpen} onOpenChange={(open) => {
                         setIsModalOpen(open);
                         if (!open) window.location.reload();
-                      }}>
+                    }}>
                         <DialogTrigger asChild>
                             <Button variant="outline" size="sm" className="flex items-center gap-2">
                                 <ListChecks className="size-4" />
@@ -359,9 +360,14 @@ export const getProjectsColumns = ({ onDelete }: { onDelete: (project: Project) 
 
                             <div className="flex justify-end mb-4">
                                 {!isFormOpen && (
-                                    <Button size="sm" onClick={() => { setEditingTask(null); setIsFormOpen(true); }}>
-                                        <Plus className="mr-2 size-4" /> Add New Task
-                                    </Button>
+                                    <div className="flex items-center gap-2">
+                                        <Button size="sm" onClick={() => { setEditingTask(null); automateTaskAssignment(project.id); }}>
+                                            <Bot className="mr-2 size-4" /> Automate Task Assignments
+                                        </Button>
+                                        <Button size="sm" onClick={() => { setEditingTask(null); setIsFormOpen(true); }}>
+                                            <Plus className="mr-2 size-4" /> Add New Task
+                                        </Button>
+                                    </div>
                                 )}
                             </div>
 
@@ -376,21 +382,21 @@ export const getProjectsColumns = ({ onDelete }: { onDelete: (project: Project) 
                                             <Input id="end_date" type="date" value={formData.end_date ? new Date(formData.end_date).toISOString().split('T')[0] : ''} onChange={handleInputChange} />
                                         </div>
                                         <Select
-                                          value={formData.status ? String(formData.status) : "To Do"}
-                                          onValueChange={(value) =>
-                                            setFormData(prev => ({ ...prev, status: value as "To Do" | "In Progress" | "Done" }))
-                                          }                                        >
-                                          <SelectTrigger>
-                                              <SelectValue placeholder="Select a status" />
-                                          </SelectTrigger>
-                                          <SelectContent>
-                                              {["To Do", "In Progress", "Done"].map(status => (
-                                                  <SelectItem key={status} value={status}>
-                                                      {status}
-                                                  </SelectItem>
-                                              ))}
-                                          </SelectContent>
-                                      </Select>
+                                            value={formData.status ? String(formData.status) : "To Do"}
+                                            onValueChange={(value) =>
+                                                setFormData(prev => ({ ...prev, status: value as "To Do" | "In Progress" | "Done" }))
+                                            }                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select a status" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {["To Do", "In Progress", "Done"].map(status => (
+                                                    <SelectItem key={status} value={status}>
+                                                        {status}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                         <Input id="estimated_hours" type="number" placeholder="Estimated Hours" value={formData.estimated_hours ?? ''} onChange={handleInputChange} />
                                     </div>
                                     <div className="flex justify-end gap-2 mt-4">

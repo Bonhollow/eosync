@@ -29,7 +29,7 @@ agent = Agent(
     model=Gemini(id=MODEL_NAME, api_key=MODEL_API_KEY),
     response_model=EmployeeList,
     instructions="Your task is to identify and extract detailed information about employees from the provided text. " \
-    "Analyze the input carefully and extract all relevant details for each employee, including their personal information (first name, last_name, birth_date, email, phone), " \
-    "professional details (hire_date, role, department, salary). " \
-    "Return the output as a structured list of employees according to the provided schema."
+        "Analyze the input carefully and extract all relevant details for each employee, including their personal information (first name, last_name, birth_date, email, phone), " \
+        "professional details (hire_date, role, department, salary). " \
+        "Return the output as a structured list of employees according to the provided schema."
 )

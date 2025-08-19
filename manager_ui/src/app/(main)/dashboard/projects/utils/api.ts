@@ -32,6 +32,13 @@ export async function generateProject(query: string): Promise<Project> {
     return response.data;
 }
 
+export async function automateTaskAssignment(id: number): Promise<Project> {
+    const url = `/upload/generate/generate-assignments/${id}/`;
+
+    const response = await apiClient.post<Project>(url, null);
+
+    return response.data;
+}
 
 export async function editProject(projectId: number, projectData: Partial<NewProjectPayload>): Promise<Project> {
     const response = await apiClient.put<Project>(`/projects/${projectId}/`, projectData);
