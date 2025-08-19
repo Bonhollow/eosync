@@ -57,36 +57,30 @@ EOSYNC is an intelligent project management and workforce optimization platform 
 </p>
 
 <p align="center">
-  <strong>Comprehensive Employee Management</strong><br>
-  <em>Easily manage employees and view their project assignments and availability at a glance.</em><br>
-  <br>
-  <img src="./assets/employees.png" alt="Employee Management" width="750">
-</p>
-
-<p align="center">
   <strong>AI-Powered Employee Onboarding & Skills Management</strong><br>
+  <em>Easily manage employees and view their project assignments and availability at a glance.</em><br>
   <em>Automatically populate employee profiles and manage individual skills.</em><br>
   <br>
-  <img src="./assets/employees2.png" alt="Employee Profiles and Skills" width="750">
+  <img src="./assets/employees.png" alt="Employee Profiles and Skills" width="750">
 </p>
 
 <p align="center">
   <strong>Intelligent Project Generation</strong><br>
   <em>Describe your project in a prompt and let AI break it down into manageable micro-tasks.</em><br>
   <br>
-  <img src="./assets/projects.png" alt="Intelligent Project Generation" width="750">
+  <img src="./assets/projects.png" alt="Automated Task Assignment" width="750">
 </p>
 
 <p align="center">
   <strong>Automated Task Assignment</strong><br>
   <em>The AI analyzes skills and availability to assign tasks to the best-suited team members.</em><br>
   <br>
-  <img src="./assets/projects2.png" alt="Automated Task Assignment" width="750">
+  <img src="./assets/task.png" alt="Automated Task Assignment" width="750">
 </p>
 
 <p align="center">
   <strong>Customizable Interface</strong><br>
-  <em>Switch between light and dark modes for your comfort.</em><br>
+  <em>Switch between light and dark modes, themes and more for your comfort.</em><br>
   <br>
   <img src="./assets/customization.png" alt="Customizable Interface" width="750">
 </p>
