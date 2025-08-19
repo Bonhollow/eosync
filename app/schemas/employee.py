@@ -1,6 +1,7 @@
 from datetime import date
 from typing import List, Optional
 from pydantic import BaseModel, EmailStr
+
 class EmployeeBase(BaseModel):
     first_name: Optional[str] = None
     last_name: str

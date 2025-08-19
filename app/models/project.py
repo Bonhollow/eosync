@@ -8,8 +8,8 @@ class Project(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, nullable=False)
     description = Column(Text, nullable=True)
-    start_date = Column(Date, nullable=False)
+    start_date = Column(Date, nullable=True)
     end_date = Column(Date, nullable=True)
-    budget_total = Column(Float, nullable=False)
+    budget_total = Column(Float, nullable=True)
 
-    tasks = relationship('Task', back_populates='project')
+    tasks = relationship('Task', back_populates='project', cascade="all, delete-orphan")

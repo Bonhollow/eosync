@@ -25,6 +25,14 @@ export async function createProject(projectData: NewProjectPayload): Promise<Pro
     return response.data;
 }
 
+export async function generateProject(query: string): Promise<Project> {
+    const response = await apiClient.post<Project>('/upload/generate/elaborate_projects', null, {
+        params: { query }
+    });
+    return response.data;
+}
+
+
 export async function editProject(projectId: number, projectData: Partial<NewProjectPayload>): Promise<Project> {
     const response = await apiClient.put<Project>(`/projects/${projectId}/`, projectData);
     return response.data;

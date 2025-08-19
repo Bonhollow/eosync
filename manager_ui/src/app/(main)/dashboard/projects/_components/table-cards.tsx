@@ -6,6 +6,7 @@ import {
     createTask,
     deleteProject,
     getProjects,
+    generateProject
 } from "../utils/api";
 import { NewProjectPayload, Project, NewTaskPayload } from "./schema";
 
@@ -215,7 +216,39 @@ export function TableCards() {
     }
   };
 
-  const handleAiAssist = async () => { /* ... AI logic ... */ };
+  const handleAiAssist = async () => {
+    if (!aiPrompt.trim()) {
+      alert("Please describe the project first.");
+      return;
+    }
+    setProcessingAi(true);
+    try {
+      const aiProject = await generateProject(aiPrompt);
+
+      if (!aiProject) {
+        alert("The AI could not generate project details from your description. Please try again.");
+        return;
+      }
+      
+      const projectFromAi: NewProjectPayload = {
+        ...initialProjectState,
+        title: aiProject.title,
+        description: aiProject.description || null,
+      };
+
+      setNewProject(projectFromAi);
+      
+      setManualMode(true);
+      setStep(1); 
+
+    } catch (err) {
+      console.error("Error processing with AI:", err);
+      alert("An error occurred while communicating with the AI. Please try again.");
+    } finally {
+      setProcessingAi(false);
+    }
+  };
+  
   
   const closeModal = () => {
     setOpenModal(false);

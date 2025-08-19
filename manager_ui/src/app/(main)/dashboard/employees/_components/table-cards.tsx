@@ -148,17 +148,17 @@ export function TableCards() {
   };
 
   const handleFileUpload = async () => {
-    if (!file) return;
-    setUploading(true);
-    try {
-      const result = await createEmployeesFromFile(file);
-      setParsedEmployees(result);
-    } catch (err) {
-      console.error("Error uploading file:", err);
-    } finally {
-      setUploading(false);
-    }
-  };
+      if (!file) return;
+      setUploading(true);
+      try {
+        const result = await createEmployeesFromFile(file);
+        setParsedEmployees(result.employees || []);
+      } catch (err) {
+        console.error("Error uploading file:", err);
+      } finally {
+        setUploading(false);
+      }
+    };
 
   if (loading) return <p>Loading...</p>;
 

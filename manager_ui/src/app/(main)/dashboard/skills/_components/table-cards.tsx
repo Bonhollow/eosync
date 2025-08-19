@@ -73,7 +73,7 @@ export function TableCards() {
     if (!file) return;
     setUploading(true);
     try {
-      const result = await createSkillsFromFile(file); // API that sends file to backend
+      const result = await createSkillsFromFile(file);
       setParsedSkills(result.skills || []);
     } catch (err) {
       console.error("Error uploading file:", err);
