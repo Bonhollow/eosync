@@ -9,8 +9,9 @@ import {
     generateProject
 } from "../utils/api";
 import { NewProjectPayload, Project, NewTaskPayload } from "./schema";
-
+import { Bot } from "lucide-react";
 import { DataTable } from "@/components/data-table/data-table";
+import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
 import { DataTablePagination } from "@/components/data-table/data-table-pagination";
 import { Button } from "@/components/ui/button";
 import {
@@ -279,7 +280,7 @@ export function TableCards() {
         Manually Add Project
       </Button>
       <Button onClick={() => { setManualMode(false); setModeSelected(true); }}>
-        Create Project with AI Assist
+        <Bot className="mr-2 size-4" /> Create Project with AI Assist
       </Button>
     </div>
   );
@@ -367,6 +368,7 @@ export function TableCards() {
           <CardDescription>Track and manage your company's projects</CardDescription>
           <CardAction>
             <div className="flex items-center gap-2">
+              <DataTableViewOptions table={table} />
               <Button variant="outline" size="sm">Export</Button>
               <Button size="sm" onClick={() => setOpenModal(true)}>Add Projects</Button>
             </div>

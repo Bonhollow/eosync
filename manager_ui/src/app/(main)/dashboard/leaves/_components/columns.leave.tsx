@@ -75,6 +75,17 @@ export const getLeaveColumns = (): ColumnDef<Leave>[] => [
         setOpenEdit(false);
       };
 
+      const handleDelete = async (leaveId: number) => {
+        if (window.confirm("Are you sure you want to remove this leave?")) {
+          try {
+            await deleteLeave(leaveId);
+          } catch (error) {
+            console.error("Failed to delete leave:", error);
+            alert("Failed to delete leave.");
+          }
+        }
+      };
+
       return (
         <>
           <div className="flex items-center gap-2">
@@ -100,8 +111,8 @@ export const getLeaveColumns = (): ColumnDef<Leave>[] => [
             <Button
               variant="ghost"
               size="icon"
-              className="text-muted-foreground hover:text-red-600"
-              onClick={() => deleteLeave(leave.id)}
+              className="text-destructive"
+              onClick={() => handleDelete(leave.id)}
             >
               <Trash className="size-4" />
               <span className="sr-only">Delete</span>

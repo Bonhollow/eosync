@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getSkills, deleteSkill, createSkill, createSkillsFromFile } from "../utils/api";
+import { getSkills, createSkill, createSkillsFromFile } from "../utils/api";
 import { DataTable } from "@/components/data-table/data-table";
 import { DataTablePagination } from "@/components/data-table/data-table-pagination";
 import { Button } from "@/components/ui/button";
+import { Bot } from "lucide-react";
 import {
   Card,
   CardHeader,
@@ -109,7 +110,6 @@ export function TableCards() {
         </CardContent>
       </Card>
 
-      {/* Modal */}
       <Dialog open={openModal} onOpenChange={setOpenModal}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
@@ -138,14 +138,12 @@ export function TableCards() {
                   Supported formats: PDF, DOCX, XLSX, PPTX, Markdown, AsciiDoc, HTML, CSV, PNG, JPEG, TIFF, BMP, WEBP, XML
                 </p>
                 <Button onClick={handleFileUpload} disabled={!file || uploading}>
-                  {uploading ? "Processing..." : "Import file and elaborate with AI"}
+                  <Bot className="mr-2 size-4" /> {uploading ? "Processing..." : "Import file and elaborate with AI"}
                 </Button>
               </div>
-
             </div>
           )}
 
-          {/* Manual mode */}
           {manualMode && parsedSkills.length === 0 && (
             <div className="flex flex-col gap-4">
               <Textarea
@@ -157,7 +155,6 @@ export function TableCards() {
             </div>
           )}
 
-          {/* Parsed skills from AI */}
           {parsedSkills.length > 0 && (
             <div className="flex flex-col gap-4">
               <p className="font-semibold">Skills detected:</p>

@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/card";
 import { useDataTableInstance } from "@/hooks/use-data-table-instance";
 import Select from 'react-select';
-// Importa la funzione invece della costante
 import { getEmployeesColumns } from "./columns.employee";
 import {
   Dialog,
@@ -32,10 +31,9 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-// Import your schema definitions
 import { Employee } from "./schema";
+import { Bot } from "lucide-react";
 
-// Define the creation schema according to the new API format
 export interface EmployeeCreate {
   first_name: string | null;
   last_name: string;
@@ -46,7 +44,7 @@ export interface EmployeeCreate {
   role: string;
   department: string | null;
   salary: number | null;
-  skill_ids: number[]; // <-- CHANGED: from 'skills' to 'skill_ids'
+  skill_ids: number[];
 }
 
 
@@ -101,7 +99,7 @@ export function TableCards() {
     control: (provided: any, state: any) => ({
       ...provided,
       minHeight: '32px',
-      height: 'auto', // Allow it to grow if many skills are selected
+      height: 'auto',
       boxShadow: state.isFocused ? '0 0 0 1px #2563eb' : 'none',
       borderColor: state.isFocused ? '#a5b4fc' : '#d1d5db',
       ':hover': {
@@ -213,7 +211,7 @@ export function TableCards() {
                   Supported formats: PDF, DOCX, XLSX, PPTX, Markdown, AsciiDoc, HTML, CSV, PNG, JPEG, TIFF, BMP, WEBP, XML
                 </p>
                 <Button onClick={handleFileUpload} disabled={!file || uploading}>
-                  {uploading ? "Processing..." : "Import file and elaborate with AI"}
+                  <Bot className="mr-2 size-4" /> {uploading ? "Processing..." : "Import file and elaborate with AI"}
                 </Button>
               </div>
             </div>

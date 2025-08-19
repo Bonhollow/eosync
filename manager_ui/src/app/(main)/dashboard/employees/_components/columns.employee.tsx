@@ -134,36 +134,36 @@ export const getEmployeesColumns = (skillOptions: SkillOption[]): ColumnDef<Empl
   {
     accessorKey: "salary",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Salary" />,
-    cell: ({ row }) => (
-      <span>
-        {row.original.salary != null ? row.original.salary.toFixed(2) : "-"}
-      </span>
-    ),
+    cell: ({ row }) => row.getValue("salary") ? new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(parseInt(row.getValue("salary"))) : "-",
     enableSorting: false,
   },
   {
     id: "actions",
-    cell: ({ row, table }) => { // <-- Destructure 'table' to access meta
+    cell: ({ row, table }) => {
       const employee: Employee = row.original;
       const [openEdit, setOpenEdit] = useState(false);
       
-      // ** CHANGED **: Initialize form state by mapping skills to skill_ids
       const [formData, setFormData] = useState({
         ...employee,
         skill_ids: employee.skills ? employee.skills.map(skill => skill.id) : [],
       });
 
       const onSave = async () => {
-        // ** CHANGED **: Create the payload by excluding non-updatable fields
         const { id, skills, ...payload } = formData;
         
         await editEmployee(employee.id, payload as EmployeeUpdatePayload);
         setOpenEdit(false);
+      };
 
-        // To see changes, you need to refresh the table's data.
-        // The recommended way is to use a function passed via table.meta.
-        // Example: (table.meta as any)?.refreshData?.();
-        // A simpler but less ideal way: window.location.reload();
+      const handleDelete = async (employeeId: number) => {
+        if (window.confirm("Are you sure you want to remove this employee?")) {
+          try {
+            await deleteEmployee(employeeId);
+          } catch (error) {
+            console.error("Failed to delete employee:", error);
+            alert("Failed to delete employee.");
+          }
+        }
       };
 
       return (
@@ -174,7 +174,6 @@ export const getEmployeesColumns = (skillOptions: SkillOption[]): ColumnDef<Empl
               size="icon"
               className="text-muted-foreground"
               onClick={() => {
-                // Re-initialize form data every time the dialog opens to ensure it's fresh
                 setFormData({
                     ...employee,
                     skill_ids: employee.skills ? employee.skills.map(skill => skill.id) : [],
@@ -188,8 +187,8 @@ export const getEmployeesColumns = (skillOptions: SkillOption[]): ColumnDef<Empl
             <Button
               variant="ghost"
               size="icon"
-              className="text-muted-foreground"
-              onClick={() => deleteEmployee(employee.id)}
+              className="text-destructive"
+              onClick={() => handleDelete(employee.id)}
             >
               <Trash className="size-4" />
               <span className="sr-only">Delete</span>
@@ -209,7 +208,6 @@ export const getEmployeesColumns = (skillOptions: SkillOption[]): ColumnDef<Empl
                   onSave();
                 }}
               >
-                {/* --- Input fields (no changes here) --- */}
                 <div>
                   <label htmlFor="first_name" className="block text-xs font-medium mb-1">
                     First Name
@@ -332,7 +330,6 @@ export const getEmployeesColumns = (skillOptions: SkillOption[]): ColumnDef<Empl
                   />
                 </div>
                 
-                {/* --- Skills Section (Updated) --- */}
                 <div className="md:col-span-2">
                   <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="skills">
                     Skills
@@ -342,11 +339,9 @@ export const getEmployeesColumns = (skillOptions: SkillOption[]): ColumnDef<Empl
                     instanceId="skills"
                     isMulti
                     options={skillOptions}
-                    // ** CHANGED **: Value prop now filters options based on skill_ids
                     value={skillOptions.filter(option => 
                       formData.skill_ids.includes(option.value)
                     )}
-                    // ** CHANGED **: onChange now updates the skill_ids array
                     onChange={(selectedOptions) => {
                       setFormData(prev => ({
                         ...prev,
@@ -364,7 +359,7 @@ export const getEmployeesColumns = (skillOptions: SkillOption[]): ColumnDef<Empl
                     Save Changes
                   </Button>
                   <Button
-                    type="button" // Important: Prevent form submission
+                    type="button"
                     variant="ghost"
                     size="sm"
                     onClick={() => setOpenEdit(false)}

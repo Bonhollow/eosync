@@ -12,10 +12,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { deleteSkill, editSkill } from "../utils/api"; // Make sure to create and import editSkill
+import { deleteSkill, editSkill } from "../utils/api"; 
 import { skillSchema } from "./schema";
 
-// Define the type for the payload sent to the PUT endpoint for updating a skill.
 interface SkillUpdatePayload {
   name?: string;
 }
@@ -51,6 +50,17 @@ export const skillsColumns: ColumnDef<z.infer<typeof skillSchema>>[] = [
         window.location.reload(); 
       };
 
+      const handleDelete = async (skillId: number) => {
+        if (window.confirm("Are you sure you want to remove this skill?")) {
+          try {
+            await deleteSkill(skillId);
+          } catch (error) {
+            console.error("Failed to delete skill:", error);
+            alert("Failed to delete skill.");
+          }
+        }
+      };
+
       return (
         <>
           <div className="flex items-center gap-2">
@@ -70,8 +80,8 @@ export const skillsColumns: ColumnDef<z.infer<typeof skillSchema>>[] = [
             <Button
               variant="ghost"
               size="icon"
-              className="text-muted-foreground"
-              onClick={() => deleteSkill(parseInt(skill.id.toString()))}
+              className="text-destructive"
+              onClick={() => handleDelete(skill.id)}
             >
               <Trash className="size-4" />
               <span className="sr-only">Delete</span>

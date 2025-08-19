@@ -15,6 +15,7 @@ import {
   CardAction
 } from "@/components/ui/card";
 import { useDataTableInstance } from "@/hooks/use-data-table-instance";
+import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
 import { getLeaveColumns } from "./columns.leave";
 import {
   Dialog,
@@ -98,6 +99,7 @@ export function TableCards() {
           <CardDescription>Track and manage employee leave requests</CardDescription>
           <CardAction>
             <div className="flex items-center gap-2">
+              <DataTableViewOptions table={table} />
               <Button variant="outline" size="sm">
                 Export
               </Button>
