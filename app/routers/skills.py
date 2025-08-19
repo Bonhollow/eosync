@@ -25,15 +25,11 @@ def read_skills(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
 
 @router.put("/{skill_id}", response_model=SkillSchema)
 def update_skill(skill_id: int, skill: SkillUpdate, db: Session = Depends(get_db)):
-    """
-    Update a skill's details.
-    """
     db_skill = db.query(SkillModel).get(skill_id)
     
     if not db_skill:
         raise HTTPException(status_code=404, detail="Skill not found")
         
-    # Update the skill's name
     db_skill.name = skill.name
     
     db.commit()

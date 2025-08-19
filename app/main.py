@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from core.config import settings
 from core.database import engine, Base
-from routers import employees, skills, projects, tasks, assignments, leaves, upload
+from routers import employees, skills, projects, tasks, assignments, leaves, upload, analytics
 from fastapi.middleware.cors import CORSMiddleware
 
 Base.metadata.create_all(bind=engine)
@@ -23,6 +23,7 @@ app.include_router(tasks.router, prefix="/tasks", tags=["Tasks"])
 app.include_router(assignments.router, prefix="/assignments", tags=["Assignments"])
 app.include_router(leaves.router, prefix="/leaves", tags=["Leaves"])
 app.include_router(upload.router, prefix="/upload", tags=["upload"])
+app.include_router(analytics.router, prefix="/analytics", tags=["Analytics"])
 
 @app.get("/")
 def read_root():

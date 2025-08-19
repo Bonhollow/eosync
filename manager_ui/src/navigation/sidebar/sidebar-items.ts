@@ -62,11 +62,6 @@ export const sidebarItems: NavGroup[] = [
         title: "Skills",
         url: "/dashboard/skills",
         icon: Wrench,
-      },
-      {
-        title: "CRM",
-        url: "/dashboard/crm",
-        icon: ChartBar,
       }
     ],
   }

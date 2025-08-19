@@ -1,14 +1,30 @@
-import { ChartAreaInteractive } from "./_components/chart-area-interactive";
-import { DataTable } from "./_components/data-table";
-import data from "./_components/data.json";
-import { SectionCards } from "./_components/section-cards";
+import { InsightCards } from "./_components/insight-cards";
+import { OperationalCards } from "./_components/operational-cards";
+import { OverviewCards } from "./_components/overview-cards";
+import { EmployeeAssignmentsCard } from "./_components/employee-assignments-card";
+import { getAnalytics } from "./utils/api";
 
-export default function Page() {
+export default async function Page() {
+  const analyticsData = await getAnalytics();
+
   return (
-    <div className="@container/main flex flex-col gap-4 md:gap-6">
-      <SectionCards />
-      <ChartAreaInteractive />
-      <DataTable data={data} />
+    <div className="flex flex-col gap-4 md:gap-6">
+      <OverviewCards
+        projectHealth={analyticsData.project_health}
+        resourceManagement={analyticsData.resource_management}
+        taskPerformance={analyticsData.task_performance}
+      />
+      <InsightCards
+        projectHealth={analyticsData.project_health}
+        taskPerformance={analyticsData.task_performance}
+      />
+      <EmployeeAssignmentsCard
+        employeeAssignments={analyticsData.employee_assignments}
+      />
+      <OperationalCards
+        projectData={analyticsData.project_health}
+        taskData={analyticsData.task_performance}
+      />
     </div>
   );
 }
