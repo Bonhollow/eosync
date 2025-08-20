@@ -37,9 +37,8 @@ export function TableCards() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [openModal, setOpenModal] = useState(false);
-  const [currentLeave, setCurrentLeave] = useState<Partial<LeaveCreate & {id?: number}>>({});
+  const [currentLeave, setCurrentLeave] = useState<Partial<LeaveCreate & { id?: number }>>({});
   const [formErrors, setFormErrors] = useState<any>({});
-
 
   const fetchLeavesAndEmployees = () => {
     setLoading(true);
@@ -56,7 +55,7 @@ export function TableCards() {
     fetchLeavesAndEmployees();
   }, []);
 
-  const columns = getLeaveColumns();
+  const columns = getLeaveColumns(fetchLeavesAndEmployees);
 
   const table = useDataTableInstance({
     data: leaves,
@@ -72,15 +71,22 @@ export function TableCards() {
 
   const handleSave = async () => {
     try {
-        const payload = {
-            ...currentLeave,
-            reason: currentLeave.reason || null
-        };
-        const validatedData = leaveCreateSchema.parse(payload);
+      const payload = {
+        ...currentLeave,
+        reason: currentLeave.reason || null,
+      };
+
+      const validatedData = leaveCreateSchema.parse(payload);
+
+      if (currentLeave.id) {
+        await updateLeave(currentLeave.id, validatedData as LeaveUpdate);
+      } else {
         await createLeave(validatedData);
-        fetchLeavesAndEmployees(); 
-        setOpenModal(false);
-    } catch(error) {
+      }
+
+      setOpenModal(false); 
+      fetchLeavesAndEmployees();
+    } catch (error) {
       if (error instanceof z.ZodError) {
         setFormErrors(error.flatten().fieldErrors);
       } else {
@@ -120,79 +126,147 @@ export function TableCards() {
       <Dialog open={openModal} onOpenChange={setOpenModal}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>Make a new request</DialogTitle>
+            <DialogTitle>
+              {currentLeave.id ? "Edit request" : "Make a new request"}
+            </DialogTitle>
             <DialogDescription>
-              Fill in the details to submit a new request.
+              {currentLeave.id
+                ? "Modify the details of this leave request."
+                : "Fill in the details to submit a new request."}
             </DialogDescription>
           </DialogHeader>
 
-            <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="employee" className="text-right">Employee</Label>
-                    <Select
-                        value={currentLeave.employee_id?.toString()}
-                        onValueChange={(value) => setCurrentLeave(prev => ({...prev, employee_id: Number(value)}))}
-                    >
-                        <SelectTrigger className="col-span-3">
-                            <SelectValue placeholder="Select an employee" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {employees.map(emp => (
-                                <SelectItem key={emp.id} value={emp.id.toString()}>{emp.first_name} {emp.last_name}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                    {formErrors.employee_id && <p className="col-span-4 text-red-500 text-sm text-right">{formErrors.employee_id[0]}</p>}
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="type" className="text-right">Type</Label>
-                    <Select
-                        value={currentLeave.type}
-                        onValueChange={(value: 'Vacation' | 'Sick' | 'Other') => setCurrentLeave(prev => ({...prev, type: value}))}
-                    >
-                        <SelectTrigger className="col-span-3">
-                            <SelectValue placeholder="Select a type of leave" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="Vacation">Vacation</SelectItem>
-                            <SelectItem value="Sick">Sick</SelectItem>
-                            <SelectItem value="Other">Other</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="start_date" className="text-right">Start Date</Label>
-                    <Input id="start_date" type="date" value={currentLeave.start_date || ''} onChange={e => setCurrentLeave(prev => ({...prev, start_date: e.target.value}))} className="col-span-3" />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="end_date" className="text-right">End Date</Label>
-                    <Input id="end_date" type="date" value={currentLeave.end_date || ''} onChange={e => setCurrentLeave(prev => ({...prev, end_date: e.target.value}))} className="col-span-3" />
-                </div>
-                <div>
-                  <label htmlFor="approved" className="flex items-center gap-2 text-sm font-bold">
-                    <Input
-                      type="checkbox"
-                      id="approved"
-                      checked={currentLeave.approved || false}
-                      onChange={(e) =>
-                        setCurrentLeave(prev => ({...prev, approved: e.target.checked}))
-                      }
-                      className="size-4"
-                    />
-                    Approved
-                  </label>
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="reason" className="text-right">Reason</Label>
-                    <Textarea id="reason" value={currentLeave.reason || ''} onChange={e => setCurrentLeave(prev => ({...prev, reason: e.target.value}))} className="col-span-3" placeholder="Motivo (opzionale)"/>
-                </div>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="employee" className="text-right">
+                Employee
+              </Label>
+              <Select
+                value={currentLeave.employee_id?.toString()}
+                onValueChange={(value) =>
+                  setCurrentLeave((prev) => ({
+                    ...prev,
+                    employee_id: Number(value),
+                  }))
+                }
+              >
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Select an employee" />
+                </SelectTrigger>
+                <SelectContent>
+                  {employees.map((emp) => (
+                    <SelectItem key={emp.id} value={emp.id.toString()}>
+                      {emp.first_name} {emp.last_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {formErrors.employee_id && (
+                <p className="col-span-4 text-red-500 text-sm text-right">
+                  {formErrors.employee_id[0]}
+                </p>
+              )}
             </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="type" className="text-right">
+                Type
+              </Label>
+              <Select
+                value={currentLeave.type}
+                onValueChange={(value: "Vacation" | "Sick" | "Other") =>
+                  setCurrentLeave((prev) => ({ ...prev, type: value }))
+                }
+              >
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Select a type of leave" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Vacation">Vacation</SelectItem>
+                  <SelectItem value="Sick">Sick</SelectItem>
+                  <SelectItem value="Other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="start_date" className="text-right">
+                Start Date
+              </Label>
+              <Input
+                id="start_date"
+                type="date"
+                value={currentLeave.start_date || ""}
+                onChange={(e) =>
+                  setCurrentLeave((prev) => ({
+                    ...prev,
+                    start_date: e.target.value,
+                  }))
+                }
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="end_date" className="text-right">
+                End Date
+              </Label>
+              <Input
+                id="end_date"
+                type="date"
+                value={currentLeave.end_date || ""}
+                onChange={(e) =>
+                  setCurrentLeave((prev) => ({
+                    ...prev,
+                    end_date: e.target.value,
+                  }))
+                }
+                className="col-span-3"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="approved"
+                className="flex items-center gap-2 text-sm font-bold"
+              >
+                <Input
+                  type="checkbox"
+                  id="approved"
+                  checked={currentLeave.approved || false}
+                  onChange={(e) =>
+                    setCurrentLeave((prev) => ({
+                      ...prev,
+                      approved: e.target.checked,
+                    }))
+                  }
+                  className="size-4"
+                />
+                Approved
+              </label>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="reason" className="text-right">
+                Reason
+              </Label>
+              <Textarea
+                id="reason"
+                value={currentLeave.reason || ""}
+                onChange={(e) =>
+                  setCurrentLeave((prev) => ({
+                    ...prev,
+                    reason: e.target.value,
+                  }))
+                }
+                className="col-span-3"
+                placeholder="Motivo (opzionale)"
+              />
+            </div>
+          </div>
 
           <DialogFooter>
             <DialogClose asChild>
-                <Button variant="ghost">Cancel</Button>
+              <Button variant="ghost">Cancel</Button>
             </DialogClose>
-            <Button onClick={handleSave}>Save</Button>
+            <Button onClick={handleSave}>
+              {currentLeave.id ? "Update" : "Save"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

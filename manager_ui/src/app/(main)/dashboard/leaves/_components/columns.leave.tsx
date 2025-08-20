@@ -18,7 +18,7 @@ import { updateLeave, deleteLeave } from "../utils/api";
 
 type LeaveFormData = Omit<Leave, "id" | "employee">;
 
-export const getLeaveColumns = (): ColumnDef<Leave>[] => [
+export const getLeaveColumns = (refreshData: () => void): ColumnDef<Leave>[] => [
   {
     accessorKey: "employee",
     header: "Employee",
@@ -65,20 +65,30 @@ export const getLeaveColumns = (): ColumnDef<Leave>[] => [
         reason: leave.reason,
       });
 
-      const onSave = () => {
-        const updatedLeave = { 
-            id: leave.id,
-            employee: leave.employee,
-            ...formData 
+      const onSave = async () => {
+        const updatedLeaveData: LeaveUpdate = {
+          ...formData
         };
-        updateLeave(updatedLeave.id, updatedLeave as LeaveUpdate);
-        setOpenEdit(false);
+
+        try {
+          await updateLeave(leave.id, updatedLeaveData);
+
+          setOpenEdit(false);
+          refreshData();
+
+        } catch (error) {
+          console.error("Failed to update leave:", error);
+          alert("Failed to save changes. Please try again.");
+        }
       };
 
       const handleDelete = async (leaveId: number) => {
         if (window.confirm("Are you sure you want to remove this leave?")) {
           try {
             await deleteLeave(leaveId);
+            
+            refreshData();
+
           } catch (error) {
             console.error("Failed to delete leave:", error);
             alert("Failed to delete leave.");
@@ -124,7 +134,6 @@ export const getLeaveColumns = (): ColumnDef<Leave>[] => [
               <DialogHeader>
                 <DialogTitle>Edit Leave</DialogTitle>
               </DialogHeader>
-
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -207,7 +216,6 @@ export const getLeaveColumns = (): ColumnDef<Leave>[] => [
                       onChange={(e) =>
                         setFormData({ ...formData, reason: e.target.value })
                       }
-                      required
                       className="text-sm"
                     />
                   </div>

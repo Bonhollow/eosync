@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { 
   getEmployees, 
   createEmployee, 
@@ -74,12 +74,18 @@ export function TableCards() {
   
   const [availableSkills, setAvailableSkills] = useState<{ id: number; name: string }[]>([]);
 
-  useEffect(() => {
+  const fetchEmployees = useCallback(() => {
     getEmployees()
       .then((data) => setEmployees(data))
       .catch((err) => console.error("Error while fetching employees:", err))
-      .finally(() => setLoading(false));
+      .finally(() => setLoading(false)); 
   }, []);
+
+
+  useEffect(() => {
+    setLoading(true);
+    fetchEmployees(); 
+  }, [fetchEmployees]);
 
   useEffect(() => {
     getSkills()
@@ -92,7 +98,10 @@ export function TableCards() {
     label: skill.name
   }));
   
-  const employeesColumns = useMemo(() => getEmployeesColumns(skillOptions), [skillOptions]);
+  const employeesColumns = useMemo(
+    () => getEmployeesColumns(skillOptions, fetchEmployees), 
+    [skillOptions, fetchEmployees]
+  );
 
 
   const customSelectStyles = {
@@ -134,8 +143,8 @@ export function TableCards() {
     }
 
     try {
-      const res = await createEmployee([manualEmployee]);
-      setEmployees((prev) => [...prev, ...res]);
+      await createEmployee([manualEmployee]);
+      fetchEmployees();
       setOpenModal(false);
       setManualMode(false);
       setManualEmployee(initialManualEmployeeState);
@@ -149,8 +158,9 @@ export function TableCards() {
       if (!file) return;
       setUploading(true);
       try {
-        const result = await createEmployeesFromFile(file);
-        setParsedEmployees(result.employees || []);
+        await createEmployeesFromFile(file);
+        fetchEmployees();
+        setOpenModal(false);
       } catch (err) {
         console.error("Error uploading file:", err);
       } finally {
@@ -374,11 +384,11 @@ export function TableCards() {
               <div className="md:col-span-2 bg-red-50 border border-red-200 rounded p-2 text-xs text-red-700">
                 <span className="font-medium">*</span> Required fields
               </div>
-              <div className="flex gap-2 justify-end pt-2">
-                <Button type="submit" size="sm">Save</Button>
-                <Button variant="ghost" size="sm" onClick={() => setManualMode(false)}>
+              <div className="flex gap-2 justify-end pt-2 md:col-span-2">
+                <Button type="button" variant="ghost" size="sm" onClick={() => setManualMode(false)}>
                   Cancel
                 </Button>
+                <Button type="submit" size="sm">Save</Button>
               </div>
             </form>
           )}
@@ -401,8 +411,8 @@ export function TableCards() {
               <Button
                 onClick={async () => {
                   try {
-                    const res = await createEmployee(parsedEmployees);
-                    setEmployees((prev) => [...prev, ...res]);
+                    await createEmployee(parsedEmployees);
+                    fetchEmployees();
                     setParsedEmployees([]);
                     setOpenModal(false);
                   } catch (err) {
@@ -417,7 +427,7 @@ export function TableCards() {
                 variant="ghost"
                 onClick={() => {
                   setParsedEmployees([]);
-                  setOpenModal(false);
+                  setFile(null);
                 }}
               >
                 Cancel

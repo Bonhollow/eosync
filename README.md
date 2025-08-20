@@ -1,7 +1,6 @@
 <p align="center">
     <img src="./assets/logo.png" align="center" width="30%">
 </p>
-<p align="center"><h1 align="center">EOSYNC</h1></p>
 <p align="center">
 	<em>AI-Powered Project and Workforce Management</em>
 </p>
@@ -1058,20 +1057,53 @@ Before getting started with eosync, ensure your runtime environment meets the fo
 
 ### ⚙️ Installation
 
-1. Clone the eosync repository:
-```sh
-❯ git clone https://github.com/Bonhollow/eosync
-```
+Here is the corrected and improved version of your README section.
 
-2. Navigate to the project directory:```sh
-❯ cd eosync
-```
+### **Installation**
 
-3. Create and configure the backend environment file.
-```sh
-❯ cp app/.env.copy app/.env
-```
-   *Note: You will need to fill in the required variables in `app/.env` for the application to run correctly.*
+1.  **Clone the eosync repository:**
+    ```sh
+    git clone https://github.com/Bonhollow/eosync
+    ```
+
+2.  **Navigate to the project directory:**
+    ```sh
+    cd eosync
+    ```
+
+3.  **Create and configure the backend environment file:**
+    ```sh
+    cp app/.env.copy app/.env
+    ```
+    ***Note:*** *You will need to fill in the required variables in `app/.env` for the application to run correctly.*
+
+    Inside the `app/.env` file, you will need to add your API key and specify the model name. By default, the configuration is set for Google's Gemini models.
+
+    ```
+    MODEL_API_KEY=your_api_key
+    MODEL_NAME=your_model_name
+    ```
+
+    For example:
+    ```
+    MODEL_API_KEY=AI*******************
+    MODEL_NAME=gemini-1.5-flash
+    ```
+
+### **Switching Language Models**
+
+This project is configured to use the Gemini API by default. If you wish to use a different language model, you will need to modify the agent files.
+
+1.  **Navigate to the agents directory:**
+    ```sh
+    cd app/agents
+    ```
+
+2.  **Edit the relevant agent file:**
+    Open the Python file for the agent you want to modify (e.g., `some_agent.py`).
+
+3.  **Change the model import and instantiation:**
+    You will need to replace the Gemini-specific import and model initialization with the corresponding code for your chosen language model provider.
 
 ### 🤖 Usage
 To run the entire application stack (frontend and backend), use Docker Compose:

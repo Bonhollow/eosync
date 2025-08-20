@@ -19,7 +19,9 @@ interface SkillUpdatePayload {
   name?: string;
 }
 
-export const skillsColumns: ColumnDef<z.infer<typeof skillSchema>>[] = [
+export const skillsColumns = (
+  refreshData: () => void
+): ColumnDef<z.infer<typeof skillSchema>>[] => [
   {
     accessorKey: "id",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Ref" />,
@@ -38,7 +40,6 @@ export const skillsColumns: ColumnDef<z.infer<typeof skillSchema>>[] = [
     cell: ({ row }) => {
       const skill = row.original;
       const [openEdit, setOpenEdit] = useState(false);
-      
       const [formData, setFormData] = useState<SkillUpdatePayload>({
         name: skill.name,
       });
@@ -46,14 +47,14 @@ export const skillsColumns: ColumnDef<z.infer<typeof skillSchema>>[] = [
       const onSave = async () => {
         await editSkill(skill.id, { name: formData.name ?? "" });
         setOpenEdit(false);
-
-        window.location.reload(); 
+        refreshData();
       };
 
       const handleDelete = async (skillId: number) => {
         if (window.confirm("Are you sure you want to remove this skill?")) {
           try {
             await deleteSkill(skillId);
+            refreshData();
           } catch (error) {
             console.error("Failed to delete skill:", error);
             alert("Failed to delete skill.");

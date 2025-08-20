@@ -1,12 +1,13 @@
+"use client";
+
 import { ColumnDef } from "@tanstack/react-table";
-import { Pen, Trash } from "lucide-react";
+import { Pen, Trash, Wrench } from "lucide-react";
 import { useState } from "react";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Employee } from "./schema";
 import { deleteEmployee, editEmployee } from "../utils/api";
-import { Wrench } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -37,7 +38,10 @@ type SkillOption = {
   label: string;
 };
 
-export const getEmployeesColumns = (skillOptions: SkillOption[]): ColumnDef<Employee>[] => [
+export const getEmployeesColumns = (
+  skillOptions: SkillOption[],
+  refreshData: () => void
+): ColumnDef<Employee>[] => [
   {
     accessorKey: "first_name",
     header: ({ column }) => <DataTableColumnHeader column={column} title="First Name" />,
@@ -139,7 +143,7 @@ export const getEmployeesColumns = (skillOptions: SkillOption[]): ColumnDef<Empl
   },
   {
     id: "actions",
-    cell: ({ row, table }) => {
+    cell: ({ row }) => {
       const employee: Employee = row.original;
       const [openEdit, setOpenEdit] = useState(false);
       
@@ -151,14 +155,21 @@ export const getEmployeesColumns = (skillOptions: SkillOption[]): ColumnDef<Empl
       const onSave = async () => {
         const { id, skills, ...payload } = formData;
         
-        await editEmployee(employee.id, payload as EmployeeUpdatePayload);
-        setOpenEdit(false);
+        try {
+          await editEmployee(employee.id, payload as EmployeeUpdatePayload);
+          setOpenEdit(false); 
+          refreshData();     
+        } catch (error) {
+          console.error("Failed to update employee:", error);
+          alert("Failed to save changes. Please try again.");
+        }
       };
 
       const handleDelete = async (employeeId: number) => {
         if (window.confirm("Are you sure you want to remove this employee?")) {
           try {
             await deleteEmployee(employeeId);
+            refreshData(); 
           } catch (error) {
             console.error("Failed to delete employee:", error);
             alert("Failed to delete employee.");
@@ -355,9 +366,6 @@ export const getEmployeesColumns = (skillOptions: SkillOption[]): ColumnDef<Empl
                 </div>
 
                 <div className="md:col-span-2 flex justify-end gap-2 pt-2">
-                  <Button type="submit" size="sm">
-                    Save Changes
-                  </Button>
                   <Button
                     type="button"
                     variant="ghost"
@@ -365,6 +373,9 @@ export const getEmployeesColumns = (skillOptions: SkillOption[]): ColumnDef<Empl
                     onClick={() => setOpenEdit(false)}
                   >
                     Cancel
+                  </Button>
+                  <Button type="submit" size="sm">
+                    Save Changes
                   </Button>
                 </div>
               </form>

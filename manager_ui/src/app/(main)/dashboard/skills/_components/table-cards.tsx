@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { getSkills, createSkill, createSkillsFromFile } from "../utils/api";
 import { DataTable } from "@/components/data-table/data-table";
 import { DataTablePagination } from "@/components/data-table/data-table-pagination";
@@ -39,16 +39,20 @@ export function TableCards() {
   const [uploading, setUploading] = useState(false);
   const [parsedSkills, setParsedSkills] = useState<string[]>([]);
 
-  useEffect(() => {
+  const refreshData = useCallback(() => {
     getSkills()
       .then((data) => setSkills(data))
       .catch((err) => console.error("Error while fetching skills:", err))
       .finally(() => setLoading(false));
   }, []);
 
+  useEffect(() => {
+    refreshData();
+  }, [refreshData]);
+
   const table = useDataTableInstance({
     data: skills,
-    columns: skillsColumns,
+    columns: skillsColumns(refreshData),
     getRowId: (row) => row.id.toString(),
   });
 
@@ -60,22 +64,27 @@ export function TableCards() {
       .filter((s) => s !== "");
 
     try {
-      const res = await createSkill(skillsArray); 
-      setSkills((prev) => [...prev, ...res]);
+      await createSkill(skillsArray);
+      refreshData();
       setOpenModal(false);
       setManualSkills("");
+      setManualMode(false);
     } catch (err) {
       console.error("Error saving skills:", err);
     }
   };
-
 
   const handleFileUpload = async () => {
     if (!file) return;
     setUploading(true);
     try {
       const result = await createSkillsFromFile(file);
-      setParsedSkills(result.skills || []);
+
+      refreshData();
+      setParsedSkills([]);
+      setFile(null);
+      setManualMode(false);
+      setOpenModal(false);
     } catch (err) {
       console.error("Error uploading file:", err);
     } finally {
@@ -104,7 +113,7 @@ export function TableCards() {
         </CardHeader>
         <CardContent className="flex size-full flex-col gap-4">
           <div className="overflow-hidden rounded-md border">
-            <DataTable table={table} columns={skillsColumns} />
+            <DataTable table={table} columns={skillsColumns(refreshData)} />
           </div>
           <DataTablePagination table={table} />
         </CardContent>
@@ -174,8 +183,8 @@ export function TableCards() {
               <Button
                 onClick={async () => {
                   try {
-                    const res = await createSkill(parsedSkills);
-                    setSkills((prev) => [...prev, ...res]);
+                    await createSkill(parsedSkills);
+                    refreshData();
                     setParsedSkills([]);
                     setFile(null);
                     setOpenModal(false);

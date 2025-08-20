@@ -4,9 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import {
     createProject,
     createTask,
-    deleteProject,
     getProjects,
-    generateProject
+    generateProject,
 } from "../utils/api";
 import { NewProjectPayload, Project, NewTaskPayload } from "./schema";
 import { Bot } from "lucide-react";
@@ -67,9 +66,7 @@ export function TableCards() {
   const [aiPrompt, setAiPrompt] = useState("");
   const [processingAi, setProcessingAi] = useState(false);
 
-
   const fetchProjects = useCallback(() => {
-    setLoading(true);
     getProjects()
       .then((data) => setProjects(data))
       .catch((err) => console.error("Error while fetching projects:", err))
@@ -77,27 +74,13 @@ export function TableCards() {
   }, []);
 
   useEffect(() => {
+    setLoading(true);
     fetchProjects();
   }, [fetchProjects]);
 
-  const handleDeleteProject = useCallback(async (projectId: number) => {
-    if (window.confirm("Are you sure you want to delete this project?")) {
-      try {
-        await deleteProject(projectId);
-        fetchProjects(); 
-      } catch (err) {
-        console.error("Failed to delete project:", err);
-        alert("Could not delete the project.");
-      }
-    }
-  }, [fetchProjects]);
-
   const columns = useMemo(
-    () =>
-      getProjectsColumns({
-        onDelete: (project: Project) => handleDeleteProject(project.id),
-      }),
-    [handleDeleteProject]
+    () => getProjectsColumns(fetchProjects),
+    [fetchProjects]
   );
 
   const table = useDataTableInstance({
@@ -184,7 +167,6 @@ export function TableCards() {
             assignments: [],
           },
         ];
-    
           
     setNewProject(prev => ({ ...prev, tasks: updatedTasks }));
     closeTaskModal();
@@ -236,12 +218,8 @@ export function TableCards() {
         title: aiProject.title,
         description: aiProject.description || null,
       };
-
-      setNewProject(projectFromAi);
-      
-      setManualMode(true);
-      setStep(1); 
-
+      fetchProjects();
+      closeModal();
     } catch (err) {
       console.error("Error processing with AI:", err);
       alert("An error occurred while communicating with the AI. Please try again.");
@@ -249,7 +227,6 @@ export function TableCards() {
       setProcessingAi(false);
     }
   };
-  
   
   const closeModal = () => {
     setOpenModal(false);
@@ -260,7 +237,7 @@ export function TableCards() {
       setAiPrompt("");
       setTaskFormData(null);
       setEditingTaskIndex(null);
-      setStep(1); 
+      setStep(1);
     }, 300);
   };
   
@@ -364,15 +341,17 @@ export function TableCards() {
     <div className="grid grid-cols-1 gap-4">
       <Card className="shadow-xs">
         <CardHeader className="flex-row items-start justify-between">
-          <CardTitle>Projects List</CardTitle>
-          <CardDescription>Track and manage your company's projects</CardDescription>
-          <CardAction>
-            <div className="flex items-center gap-2">
-              <DataTableViewOptions table={table} />
-              <Button variant="outline" size="sm">Export</Button>
-              <Button size="sm" onClick={() => setOpenModal(true)}>Add Projects</Button>
+            <div>
+                <CardTitle>Projects List</CardTitle>
+                <CardDescription>Track and manage your company's projects</CardDescription>
             </div>
-          </CardAction>
+            <CardAction>
+                <div className="flex items-center gap-2">
+                    <DataTableViewOptions table={table} />
+                    <Button variant="outline" size="sm">Export</Button>
+                    <Button size="sm" onClick={() => setOpenModal(true)}>Add Projects</Button>
+                </div>
+            </CardAction>
         </CardHeader>
         <CardContent className="flex size-full flex-col gap-4">
           <div className="overflow-hidden rounded-md border">
