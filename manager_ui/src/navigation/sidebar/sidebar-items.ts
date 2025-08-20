@@ -62,7 +62,7 @@ export const sidebarItems: NavGroup[] = [
         title: "Skills",
         url: "/dashboard/skills",
         icon: Wrench,
-      }
+      },
     ],
-  }
+  },
 ];

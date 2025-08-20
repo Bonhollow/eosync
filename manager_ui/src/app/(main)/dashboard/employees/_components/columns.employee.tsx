@@ -14,10 +14,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogDescription
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import Select from 'react-select';
+import Select from "react-select";
 import { customStyles } from "../utils/customStyles";
 
 interface EmployeeUpdatePayload {
@@ -34,111 +34,144 @@ interface EmployeeUpdatePayload {
 }
 
 type SkillOption = {
-  value: number; 
+  value: number;
   label: string;
 };
 
 export const getEmployeesColumns = (
   skillOptions: SkillOption[],
-  refreshData: () => void
+  refreshData: () => void,
 ): ColumnDef<Employee>[] => [
   {
     accessorKey: "first_name",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="First Name" />,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="First Name" />
+    ),
     cell: ({ row }) => <span>{row.original.first_name ?? "-"}</span>,
     enableHiding: false,
   },
   {
     accessorKey: "last_name",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Last Name" />,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Last Name" />
+    ),
     cell: ({ row }) => <span>{row.original.last_name ?? "-"}</span>,
     enableHiding: false,
   },
   {
     accessorKey: "birth_date",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Birth Date" />,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Birth Date" />
+    ),
     cell: ({ row }) => <span>{row.original.birth_date ?? "-"}</span>,
     enableSorting: false,
   },
   {
     accessorKey: "email",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Email" />,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Email" />
+    ),
     cell: ({ row }) => <span>{row.original.email ?? "-"}</span>,
     enableSorting: false,
   },
   {
     accessorKey: "phone",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Phone" />,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Phone" />
+    ),
     cell: ({ row }) => <span>{row.original.phone ?? "-"}</span>,
     enableSorting: false,
   },
   {
     accessorKey: "hire_date",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Hire Date" />,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Hire Date" />
+    ),
     cell: ({ row }) => <span>{row.original.hire_date ?? "-"}</span>,
     enableSorting: false,
   },
   {
     accessorKey: "role",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Role" />,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Role" />
+    ),
     cell: ({ row }) => <span>{row.original.role ?? "-"}</span>,
     enableSorting: false,
   },
   {
-      id: "skills",
-      header: "Skills",
-      cell: ({ row }) => {
-        const employee = row.original;
-        const skills = employee.skills || [];
-        const [isModalOpen, setIsModalOpen] = useState(false);
+    id: "skills",
+    header: "Skills",
+    cell: ({ row }) => {
+      const employee = row.original;
+      const skills = employee.skills || [];
+      const [isModalOpen, setIsModalOpen] = useState(false);
 
-        return (
-          <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm" className="flex items-center gap-2">
-                <Wrench className="size-4" />
-                <Badge variant="secondary" className="px-2">{skills.length}</Badge>
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>Skills for: {employee.last_name}</DialogTitle>
-                <DialogDescription>
-                  These are the skills associated with this employee.
-                </DialogDescription>
-              </DialogHeader>
+      return (
+        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+          <DialogTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <Wrench className="size-4" />
+              <Badge variant="secondary" className="px-2">
+                {skills.length}
+              </Badge>
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Skills for: {employee.last_name}</DialogTitle>
+              <DialogDescription>
+                These are the skills associated with this employee.
+              </DialogDescription>
+            </DialogHeader>
 
-              <div className="space-y-3 pt-4">
-                {skills.map(skill => (
-                  <div key={skill.id} className="flex items-center justify-between p-3 border rounded-lg bg-muted/50">
-                    <div>
-                      <p className="font-semibold">{skill.name}</p>
-                    </div>
+            <div className="space-y-3 pt-4">
+              {skills.map((skill) => (
+                <div
+                  key={skill.id}
+                  className="flex items-center justify-between p-3 border rounded-lg bg-muted/50"
+                >
+                  <div>
+                    <p className="font-semibold">{skill.name}</p>
                   </div>
-                ))}
+                </div>
+              ))}
 
-                {skills.length === 0 && (
-                  <p className="text-center text-muted-foreground py-4">
-                    No skills found for this employee.
-                  </p>
-                )}
-              </div>
-            </DialogContent>
-          </Dialog>
-        );
-      },
-      enableSorting: false,
+              {skills.length === 0 && (
+                <p className="text-center text-muted-foreground py-4">
+                  No skills found for this employee.
+                </p>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+      );
+    },
+    enableSorting: false,
   },
   {
     accessorKey: "department",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Department" />,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Department" />
+    ),
     cell: ({ row }) => <span>{row.original.department ?? "-"}</span>,
     enableSorting: false,
   },
   {
     accessorKey: "salary",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Salary" />,
-    cell: ({ row }) => row.getValue("salary") ? new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(parseInt(row.getValue("salary"))) : "-",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Salary" />
+    ),
+    cell: ({ row }) =>
+      row.getValue("salary")
+        ? new Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: "USD",
+          }).format(parseInt(row.getValue("salary")))
+        : "-",
     enableSorting: false,
   },
   {
@@ -146,19 +179,21 @@ export const getEmployeesColumns = (
     cell: ({ row }) => {
       const employee: Employee = row.original;
       const [openEdit, setOpenEdit] = useState(false);
-      
+
       const [formData, setFormData] = useState({
         ...employee,
-        skill_ids: employee.skills ? employee.skills.map(skill => skill.id) : [],
+        skill_ids: employee.skills
+          ? employee.skills.map((skill) => skill.id)
+          : [],
       });
 
       const onSave = async () => {
         const { id, skills, ...payload } = formData;
-        
+
         try {
           await editEmployee(employee.id, payload as EmployeeUpdatePayload);
-          setOpenEdit(false); 
-          refreshData();     
+          setOpenEdit(false);
+          refreshData();
         } catch (error) {
           console.error("Failed to update employee:", error);
           alert("Failed to save changes. Please try again.");
@@ -169,7 +204,7 @@ export const getEmployeesColumns = (
         if (window.confirm("Are you sure you want to remove this employee?")) {
           try {
             await deleteEmployee(employeeId);
-            refreshData(); 
+            refreshData();
           } catch (error) {
             console.error("Failed to delete employee:", error);
             alert("Failed to delete employee.");
@@ -186,8 +221,10 @@ export const getEmployeesColumns = (
               className="text-muted-foreground"
               onClick={() => {
                 setFormData({
-                    ...employee,
-                    skill_ids: employee.skills ? employee.skills.map(skill => skill.id) : [],
+                  ...employee,
+                  skill_ids: employee.skills
+                    ? employee.skills.map((skill) => skill.id)
+                    : [],
                 });
                 setOpenEdit(true);
               }}
@@ -220,44 +257,65 @@ export const getEmployeesColumns = (
                 }}
               >
                 <div>
-                  <label htmlFor="first_name" className="block text-xs font-medium mb-1">
+                  <label
+                    htmlFor="first_name"
+                    className="block text-xs font-medium mb-1"
+                  >
                     First Name
                   </label>
                   <Input
                     id="first_name"
                     value={formData.first_name ?? ""}
-                    onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, first_name: e.target.value })
+                    }
                     className="text-sm h-8"
                   />
                 </div>
                 <div>
-                  <label htmlFor="last_name" className="block text-xs font-bold mb-1">
+                  <label
+                    htmlFor="last_name"
+                    className="block text-xs font-bold mb-1"
+                  >
                     Last Name *
                   </label>
                   <Input
                     id="last_name"
                     value={formData.last_name ?? ""}
-                    onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, last_name: e.target.value })
+                    }
                     required
                     className="text-sm h-8"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="birth_date">
+                  <label
+                    className="block text-xs font-medium text-gray-700 mb-1"
+                    htmlFor="birth_date"
+                  >
                     Birth Date
                   </label>
                   <Input
                     id="birth_date"
                     type="date"
                     value={formData.birth_date ?? ""}
-                    onChange={(e) => setFormData(formData => ({ ...formData, birth_date: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((formData) => ({
+                        ...formData,
+                        birth_date: e.target.value,
+                      }))
+                    }
                     className="text-sm h-8"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="email">
+                  <label
+                    className="block text-xs font-medium text-gray-700 mb-1"
+                    htmlFor="email"
+                  >
                     Email
                   </label>
                   <Input
@@ -265,66 +323,106 @@ export const getEmployeesColumns = (
                     type="email"
                     placeholder="email@example.com"
                     value={formData.email ?? ""}
-                    onChange={(e) => setFormData(formData => ({ ...formData, email: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((formData) => ({
+                        ...formData,
+                        email: e.target.value,
+                      }))
+                    }
                     className="text-sm h-8"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="phone">
+                  <label
+                    className="block text-xs font-medium text-gray-700 mb-1"
+                    htmlFor="phone"
+                  >
                     Phone
                   </label>
                   <Input
                     id="phone"
                     placeholder="Phone number"
                     value={formData.phone ?? ""}
-                    onChange={(e) => setFormData(formData => ({ ...formData, phone: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((formData) => ({
+                        ...formData,
+                        phone: e.target.value,
+                      }))
+                    }
                     className="text-sm h-8"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="hire_date">
+                  <label
+                    className="block text-xs font-medium text-gray-700 mb-1"
+                    htmlFor="hire_date"
+                  >
                     Hire Date
                   </label>
                   <Input
                     id="hire_date"
                     type="date"
                     value={formData.hire_date ?? ""}
-                    onChange={(e) => setFormData(formData => ({ ...formData, hire_date: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((formData) => ({
+                        ...formData,
+                        hire_date: e.target.value,
+                      }))
+                    }
                     className="text-sm h-8"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-900 mb-1" htmlFor="role">
+                  <label
+                    className="block text-xs font-bold text-gray-900 mb-1"
+                    htmlFor="role"
+                  >
                     Role *
                   </label>
                   <Input
                     id="role"
                     placeholder="Job role"
                     value={formData.role ?? ""}
-                    onChange={(e) => setFormData(formData => ({ ...formData, role: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((formData) => ({
+                        ...formData,
+                        role: e.target.value,
+                      }))
+                    }
                     required
                     className="text-sm h-8"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="department">
+                  <label
+                    className="block text-xs font-medium text-gray-700 mb-1"
+                    htmlFor="department"
+                  >
                     Department
                   </label>
                   <Input
                     id="department"
                     placeholder="Department"
                     value={formData.department ?? ""}
-                    onChange={(e) => setFormData(formData => ({ ...formData, department: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((formData) => ({
+                        ...formData,
+                        department: e.target.value,
+                      }))
+                    }
                     className="text-sm h-8"
                   />
                 </div>
 
                 <div className="md:col-span-2">
-                  <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="salary">
+                  <label
+                    className="block text-xs font-medium text-gray-700 mb-1"
+                    htmlFor="salary"
+                  >
                     Salary
                   </label>
                   <Input
@@ -335,14 +433,20 @@ export const getEmployeesColumns = (
                     value={formData.salary ?? ""}
                     onChange={(e) => {
                       const val = e.target.value;
-                      setFormData(formData => ({ ...formData, salary: val === "" ? null : parseFloat(val) }));
+                      setFormData((formData) => ({
+                        ...formData,
+                        salary: val === "" ? null : parseFloat(val),
+                      }));
                     }}
                     className="text-sm h-8 max-w-xs"
                   />
                 </div>
-                
+
                 <div className="md:col-span-2">
-                  <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="skills">
+                  <label
+                    className="block text-xs font-medium text-gray-700 mb-1"
+                    htmlFor="skills"
+                  >
                     Skills
                   </label>
                   <Select
@@ -350,13 +454,15 @@ export const getEmployeesColumns = (
                     instanceId="skills"
                     isMulti
                     options={skillOptions}
-                    value={skillOptions.filter(option => 
-                      formData.skill_ids.includes(option.value)
+                    value={skillOptions.filter((option) =>
+                      formData.skill_ids.includes(option.value),
                     )}
                     onChange={(selectedOptions) => {
-                      setFormData(prev => ({
+                      setFormData((prev) => ({
                         ...prev,
-                        skill_ids: selectedOptions ? selectedOptions.map(opt => opt.value) : [],
+                        skill_ids: selectedOptions
+                          ? selectedOptions.map((opt) => opt.value)
+                          : [],
                       }));
                     }}
                     styles={customStyles}

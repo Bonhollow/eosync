@@ -13,19 +13,27 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Leave, LeaveUpdate } from "./schema";
-import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from "@/components/ui/select";
+import {
+  Select,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+} from "@/components/ui/select";
 import { updateLeave, deleteLeave } from "../utils/api";
 
 type LeaveFormData = Omit<Leave, "id" | "employee">;
 
-export const getLeaveColumns = (refreshData: () => void): ColumnDef<Leave>[] => [
+export const getLeaveColumns = (
+  refreshData: () => void,
+): ColumnDef<Leave>[] => [
   {
     accessorKey: "employee",
     header: "Employee",
     cell: ({ row }) => {
-        const employee = row.original.employee;
-        return <div>{`#${employee.id} ${employee.last_name}`}</div>
-    }
+      const employee = row.original.employee;
+      return <div>{`#${employee.id} ${employee.last_name}`}</div>;
+    },
   },
   {
     accessorKey: "type",
@@ -47,8 +55,12 @@ export const getLeaveColumns = (refreshData: () => void): ColumnDef<Leave>[] => 
     accessorKey: "approved",
     header: "Status",
     cell: ({ row }) => {
-        const isApproved = row.getValue("approved");
-        return <Badge variant={isApproved ? "default" : "secondary"}>{isApproved ? "Approved" : "Pending"}</Badge>;
+      const isApproved = row.getValue("approved");
+      return (
+        <Badge variant={isApproved ? "default" : "secondary"}>
+          {isApproved ? "Approved" : "Pending"}
+        </Badge>
+      );
     },
   },
   {
@@ -56,7 +68,7 @@ export const getLeaveColumns = (refreshData: () => void): ColumnDef<Leave>[] => 
     cell: ({ row }) => {
       const leave = row.original;
       const [openEdit, setOpenEdit] = useState(false);
-      
+
       const [formData, setFormData] = useState<LeaveFormData>({
         type: leave.type,
         start_date: leave.start_date,
@@ -67,7 +79,7 @@ export const getLeaveColumns = (refreshData: () => void): ColumnDef<Leave>[] => 
 
       const onSave = async () => {
         const updatedLeaveData: LeaveUpdate = {
-          ...formData
+          ...formData,
         };
 
         try {
@@ -75,7 +87,6 @@ export const getLeaveColumns = (refreshData: () => void): ColumnDef<Leave>[] => 
 
           setOpenEdit(false);
           refreshData();
-
         } catch (error) {
           console.error("Failed to update leave:", error);
           alert("Failed to save changes. Please try again.");
@@ -86,9 +97,8 @@ export const getLeaveColumns = (refreshData: () => void): ColumnDef<Leave>[] => 
         if (window.confirm("Are you sure you want to remove this leave?")) {
           try {
             await deleteLeave(leaveId);
-            
-            refreshData();
 
+            refreshData();
           } catch (error) {
             console.error("Failed to delete leave:", error);
             alert("Failed to delete leave.");
@@ -117,7 +127,7 @@ export const getLeaveColumns = (refreshData: () => void): ColumnDef<Leave>[] => 
               <Pen className="size-4" />
               <span className="sr-only">Edit</span>
             </Button>
-            
+
             <Button
               variant="ghost"
               size="icon"
@@ -142,7 +152,10 @@ export const getLeaveColumns = (refreshData: () => void): ColumnDef<Leave>[] => 
               >
                 <div className="grid gap-4 py-4">
                   <div>
-                    <label htmlFor="type" className="block text-sm font-bold mb-1">
+                    <label
+                      htmlFor="type"
+                      className="block text-sm font-bold mb-1"
+                    >
                       Leave Type *
                     </label>
                     <Select
@@ -162,7 +175,10 @@ export const getLeaveColumns = (refreshData: () => void): ColumnDef<Leave>[] => 
                     </Select>
                   </div>
                   <div>
-                    <label htmlFor="start_date" className="block text-sm font-bold mb-1">
+                    <label
+                      htmlFor="start_date"
+                      className="block text-sm font-bold mb-1"
+                    >
                       Start Date *
                     </label>
                     <Input
@@ -177,7 +193,10 @@ export const getLeaveColumns = (refreshData: () => void): ColumnDef<Leave>[] => 
                     />
                   </div>
                   <div>
-                    <label htmlFor="end_date" className="block text-sm font-bold mb-1">
+                    <label
+                      htmlFor="end_date"
+                      className="block text-sm font-bold mb-1"
+                    >
                       End Date *
                     </label>
                     <Input
@@ -192,13 +211,19 @@ export const getLeaveColumns = (refreshData: () => void): ColumnDef<Leave>[] => 
                     />
                   </div>
                   <div>
-                    <label htmlFor="approved" className="flex items-center gap-2 text-sm font-bold">
+                    <label
+                      htmlFor="approved"
+                      className="flex items-center gap-2 text-sm font-bold"
+                    >
                       <Input
                         type="checkbox"
                         id="approved"
                         checked={formData.approved}
                         onChange={(e) =>
-                          setFormData({ ...formData, approved: e.target.checked })
+                          setFormData({
+                            ...formData,
+                            approved: e.target.checked,
+                          })
                         }
                         className="size-4"
                       />
@@ -206,7 +231,10 @@ export const getLeaveColumns = (refreshData: () => void): ColumnDef<Leave>[] => 
                     </label>
                   </div>
                   <div>
-                    <label htmlFor="start_date" className="block text-sm font-bold mb-1">
+                    <label
+                      htmlFor="start_date"
+                      className="block text-sm font-bold mb-1"
+                    >
                       Reason
                     </label>
                     <Input

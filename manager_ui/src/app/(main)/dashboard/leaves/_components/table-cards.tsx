@@ -1,8 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getLeaves, createLeave, deleteLeave, updateLeave, getEmployees } from "../utils/api";
-import { Leave, LeaveCreate, LeaveUpdate, leaveCreateSchema, Employee } from "./schema";
+import {
+  getLeaves,
+  createLeave,
+  deleteLeave,
+  updateLeave,
+  getEmployees,
+} from "../utils/api";
+import {
+  Leave,
+  LeaveCreate,
+  LeaveUpdate,
+  leaveCreateSchema,
+  Employee,
+} from "./schema";
 import { DataTable } from "@/components/data-table/data-table";
 import { DataTablePagination } from "@/components/data-table/data-table-pagination";
 import { Button } from "@/components/ui/button";
@@ -12,7 +24,7 @@ import {
   CardTitle,
   CardContent,
   CardDescription,
-  CardAction
+  CardAction,
 } from "@/components/ui/card";
 import { useDataTableInstance } from "@/hooks/use-data-table-instance";
 import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
@@ -24,12 +36,18 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-  DialogClose
+  DialogClose,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { z } from "zod";
 
 export function TableCards() {
@@ -37,7 +55,9 @@ export function TableCards() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [openModal, setOpenModal] = useState(false);
-  const [currentLeave, setCurrentLeave] = useState<Partial<LeaveCreate & { id?: number }>>({});
+  const [currentLeave, setCurrentLeave] = useState<
+    Partial<LeaveCreate & { id?: number }>
+  >({});
   const [formErrors, setFormErrors] = useState<any>({});
 
   const fetchLeavesAndEmployees = () => {
@@ -84,7 +104,7 @@ export function TableCards() {
         await createLeave(validatedData);
       }
 
-      setOpenModal(false); 
+      setOpenModal(false);
       fetchLeavesAndEmployees();
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -102,7 +122,9 @@ export function TableCards() {
       <Card>
         <CardHeader>
           <CardTitle>Leave requests</CardTitle>
-          <CardDescription>Track and manage employee leave requests</CardDescription>
+          <CardDescription>
+            Track and manage employee leave requests
+          </CardDescription>
           <CardAction>
             <div className="flex items-center gap-2">
               <DataTableViewOptions table={table} />

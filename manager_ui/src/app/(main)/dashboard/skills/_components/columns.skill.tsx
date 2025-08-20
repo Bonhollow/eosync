@@ -12,7 +12,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { deleteSkill, editSkill } from "../utils/api"; 
+import { deleteSkill, editSkill } from "../utils/api";
 import { skillSchema } from "./schema";
 
 interface SkillUpdatePayload {
@@ -20,18 +20,22 @@ interface SkillUpdatePayload {
 }
 
 export const skillsColumns = (
-  refreshData: () => void
+  refreshData: () => void,
 ): ColumnDef<z.infer<typeof skillSchema>>[] => [
   {
     accessorKey: "id",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Ref" />,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Ref" />
+    ),
     cell: ({ row }) => <span className="tabular-nums">{row.original.id}</span>,
     enableSorting: false,
     enableHiding: false,
   },
   {
     accessorKey: "name",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Name" />
+    ),
     cell: ({ row }) => <span>{row.original.name}</span>,
     enableHiding: false,
   },
@@ -77,7 +81,7 @@ export const skillsColumns = (
               <Pen className="size-4" />
               <span className="sr-only">Edit</span>
             </Button>
-            
+
             <Button
               variant="ghost"
               size="icon"
@@ -103,7 +107,10 @@ export const skillsColumns = (
               >
                 <div className="grid gap-4 py-4">
                   <div>
-                    <label htmlFor="name" className="block text-xs font-bold mb-1">
+                    <label
+                      htmlFor="name"
+                      className="block text-xs font-bold mb-1"
+                    >
                       Skill Name *
                     </label>
                     <Input

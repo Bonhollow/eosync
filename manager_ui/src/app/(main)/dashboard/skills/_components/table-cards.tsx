@@ -12,7 +12,7 @@ import {
   CardTitle,
   CardContent,
   CardDescription,
-  CardAction
+  CardAction,
 } from "@/components/ui/card";
 import { useDataTableInstance } from "@/hooks/use-data-table-instance";
 import { skillsColumns } from "./columns.skill";
@@ -22,7 +22,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -99,7 +99,9 @@ export function TableCards() {
       <Card>
         <CardHeader>
           <CardTitle>Skills List</CardTitle>
-          <CardDescription>Track and manage your employees' skill list</CardDescription>
+          <CardDescription>
+            Track and manage your employees' skill list
+          </CardDescription>
           <CardAction>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm">
@@ -130,10 +132,7 @@ export function TableCards() {
 
           {!manualMode && parsedSkills.length === 0 && (
             <div className="flex flex-col gap-4">
-              <Button
-                variant="outline"
-                onClick={() => setManualMode(true)}
-              >
+              <Button variant="outline" onClick={() => setManualMode(true)}>
                 Manually insert
               </Button>
 
@@ -144,10 +143,17 @@ export function TableCards() {
                   onChange={(e) => setFile(e.target.files?.[0] || null)}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Supported formats: PDF, DOCX, XLSX, PPTX, Markdown, AsciiDoc, HTML, CSV, PNG, JPEG, TIFF, BMP, WEBP, XML
+                  Supported formats: PDF, DOCX, XLSX, PPTX, Markdown, AsciiDoc,
+                  HTML, CSV, PNG, JPEG, TIFF, BMP, WEBP, XML
                 </p>
-                <Button onClick={handleFileUpload} disabled={!file || uploading}>
-                  <Bot className="mr-2 size-4" /> {uploading ? "Processing..." : "Import file and elaborate with AI"}
+                <Button
+                  onClick={handleFileUpload}
+                  disabled={!file || uploading}
+                >
+                  <Bot className="mr-2 size-4" />{" "}
+                  {uploading
+                    ? "Processing..."
+                    : "Import file and elaborate with AI"}
                 </Button>
               </div>
             </div>

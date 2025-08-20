@@ -29,7 +29,13 @@ export function formatCurrency(
     noDecimals?: boolean;
   },
 ) {
-  const { currency = "USD", locale = "en-US", minimumFractionDigits, maximumFractionDigits, noDecimals } = opts ?? {};
+  const {
+    currency = "USD",
+    locale = "en-US",
+    minimumFractionDigits,
+    maximumFractionDigits,
+    noDecimals,
+  } = opts ?? {};
 
   const formatOptions: Intl.NumberFormatOptions = {
     style: "currency",

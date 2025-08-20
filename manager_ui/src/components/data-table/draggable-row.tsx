@@ -20,7 +20,9 @@ export function DraggableRow<TData>({ row }: { row: Row<TData> }) {
       }}
     >
       {row.getVisibleCells().map((cell) => (
-        <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+        <TableCell key={cell.id}>
+          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+        </TableCell>
       ))}
     </TableRow>
   );

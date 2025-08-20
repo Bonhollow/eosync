@@ -6,7 +6,7 @@ import { getAnalytics, getEmployeeSchedule } from "./utils/api";
 export default async function Page() {
   const [analyticsData, scheduleData] = await Promise.all([
     getAnalytics(),
-    getEmployeeSchedule() 
+    getEmployeeSchedule(),
   ]);
 
   return (
@@ -15,10 +15,8 @@ export default async function Page() {
         projectHealth={analyticsData.project_health}
         resourceManagement={analyticsData.resource_management}
         taskPerformance={analyticsData.task_performance}
-      />    
-      <EmployeeAssignmentsCard
-        initialScheduleData={scheduleData}
       />
+      <EmployeeAssignmentsCard initialScheduleData={scheduleData} />
       <OperationalCards
         projectData={analyticsData.project_health}
         taskData={analyticsData.task_performance}

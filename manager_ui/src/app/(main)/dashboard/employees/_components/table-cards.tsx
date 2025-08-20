@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { 
-  getEmployees, 
-  createEmployee, 
+import {
+  getEmployees,
+  createEmployee,
   createEmployeesFromFile,
-  getSkills
+  getSkills,
 } from "../utils/api";
 import { DataTable } from "@/components/data-table/data-table";
 import { DataTablePagination } from "@/components/data-table/data-table-pagination";
@@ -20,7 +20,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { useDataTableInstance } from "@/hooks/use-data-table-instance";
-import Select from 'react-select';
+import Select from "react-select";
 import { getEmployeesColumns } from "./columns.employee";
 import {
   Dialog,
@@ -47,7 +47,6 @@ export interface EmployeeCreate {
   skill_ids: number[];
 }
 
-
 export function TableCards() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
@@ -70,21 +69,24 @@ export function TableCards() {
     skill_ids: [],
   };
 
-  const [manualEmployee, setManualEmployee] = useState<EmployeeCreate>(initialManualEmployeeState);
-  
-  const [availableSkills, setAvailableSkills] = useState<{ id: number; name: string }[]>([]);
+  const [manualEmployee, setManualEmployee] = useState<EmployeeCreate>(
+    initialManualEmployeeState,
+  );
+
+  const [availableSkills, setAvailableSkills] = useState<
+    { id: number; name: string }[]
+  >([]);
 
   const fetchEmployees = useCallback(() => {
     getEmployees()
       .then((data) => setEmployees(data))
       .catch((err) => console.error("Error while fetching employees:", err))
-      .finally(() => setLoading(false)); 
+      .finally(() => setLoading(false));
   }, []);
-
 
   useEffect(() => {
     setLoading(true);
-    fetchEmployees(); 
+    fetchEmployees();
   }, [fetchEmployees]);
 
   useEffect(() => {
@@ -93,40 +95,39 @@ export function TableCards() {
       .catch((e) => console.error("Error fetching skills:", e));
   }, []);
 
-  const skillOptions = availableSkills.map(skill => ({
+  const skillOptions = availableSkills.map((skill) => ({
     value: skill.id,
-    label: skill.name
+    label: skill.name,
   }));
-  
-  const employeesColumns = useMemo(
-    () => getEmployeesColumns(skillOptions, fetchEmployees), 
-    [skillOptions, fetchEmployees]
-  );
 
+  const employeesColumns = useMemo(
+    () => getEmployeesColumns(skillOptions, fetchEmployees),
+    [skillOptions, fetchEmployees],
+  );
 
   const customSelectStyles = {
     control: (provided: any, state: any) => ({
       ...provided,
-      minHeight: '32px',
-      height: 'auto',
-      boxShadow: state.isFocused ? '0 0 0 1px #2563eb' : 'none',
-      borderColor: state.isFocused ? '#a5b4fc' : '#d1d5db',
-      ':hover': {
-        borderColor: '#9ca3af',
+      minHeight: "32px",
+      height: "auto",
+      boxShadow: state.isFocused ? "0 0 0 1px #2563eb" : "none",
+      borderColor: state.isFocused ? "#a5b4fc" : "#d1d5db",
+      ":hover": {
+        borderColor: "#9ca3af",
       },
     }),
     valueContainer: (provided: any) => ({
       ...provided,
-      minHeight: '32px',
-      padding: '0 6px'
+      minHeight: "32px",
+      padding: "0 6px",
     }),
     input: (provided: any) => ({
       ...provided,
-      margin: '0px',
+      margin: "0px",
     }),
     indicatorsContainer: (provided: any) => ({
       ...provided,
-      height: '32px',
+      height: "32px",
     }),
   };
 
@@ -155,18 +156,18 @@ export function TableCards() {
   };
 
   const handleFileUpload = async () => {
-      if (!file) return;
-      setUploading(true);
-      try {
-        await createEmployeesFromFile(file);
-        fetchEmployees();
-        setOpenModal(false);
-      } catch (err) {
-        console.error("Error uploading file:", err);
-      } finally {
-        setUploading(false);
-      }
-    };
+    if (!file) return;
+    setUploading(true);
+    try {
+      await createEmployeesFromFile(file);
+      fetchEmployees();
+      setOpenModal(false);
+    } catch (err) {
+      console.error("Error uploading file:", err);
+    } finally {
+      setUploading(false);
+    }
+  };
 
   if (loading) return <p>Loading...</p>;
 
@@ -218,10 +219,17 @@ export function TableCards() {
                   onChange={(e) => setFile(e.target.files?.[0] || null)}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Supported formats: PDF, DOCX, XLSX, PPTX, Markdown, AsciiDoc, HTML, CSV, PNG, JPEG, TIFF, BMP, WEBP, XML
+                  Supported formats: PDF, DOCX, XLSX, PPTX, Markdown, AsciiDoc,
+                  HTML, CSV, PNG, JPEG, TIFF, BMP, WEBP, XML
                 </p>
-                <Button onClick={handleFileUpload} disabled={!file || uploading}>
-                  <Bot className="mr-2 size-4" /> {uploading ? "Processing..." : "Import file and elaborate with AI"}
+                <Button
+                  onClick={handleFileUpload}
+                  disabled={!file || uploading}
+                >
+                  <Bot className="mr-2 size-4" />{" "}
+                  {uploading
+                    ? "Processing..."
+                    : "Import file and elaborate with AI"}
                 </Button>
               </div>
             </div>
@@ -230,118 +238,195 @@ export function TableCards() {
           {manualMode && parsedEmployees.length === 0 && (
             <form
               className="grid grid-cols-1 md:grid-cols-2 gap-3 gap-y-4"
-              onSubmit={(e) => { e.preventDefault(); handleSaveManual(); }}
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSaveManual();
+              }}
             >
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="first_name">
-                  First Name <span className="text-xs text-gray-400">(optional)</span>
+                <label
+                  className="block text-xs font-medium text-gray-700 mb-1"
+                  htmlFor="first_name"
+                >
+                  First Name{" "}
+                  <span className="text-xs text-gray-400">(optional)</span>
                 </label>
                 <Input
                   id="first_name"
                   placeholder="First name"
                   value={manualEmployee.first_name ?? ""}
-                  onChange={(e) => setManualEmployee(prev => ({ ...prev, first_name: e.target.value }))}
+                  onChange={(e) =>
+                    setManualEmployee((prev) => ({
+                      ...prev,
+                      first_name: e.target.value,
+                    }))
+                  }
                   className="text-sm h-8"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-900 mb-1" htmlFor="last_name">
+                <label
+                  className="block text-xs font-bold text-gray-900 mb-1"
+                  htmlFor="last_name"
+                >
                   Last Name <span className="text-red-500">*</span>
                 </label>
                 <Input
                   id="last_name"
                   placeholder="Last name"
                   value={manualEmployee.last_name ?? ""}
-                  onChange={(e) => setManualEmployee(prev => ({ ...prev, last_name: e.target.value }))}
+                  onChange={(e) =>
+                    setManualEmployee((prev) => ({
+                      ...prev,
+                      last_name: e.target.value,
+                    }))
+                  }
                   required
                   className="text-sm h-8"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="birth_date">
-                  Birth Date <span className="text-xs text-gray-400">(optional)</span>
+                <label
+                  className="block text-xs font-medium text-gray-700 mb-1"
+                  htmlFor="birth_date"
+                >
+                  Birth Date{" "}
+                  <span className="text-xs text-gray-400">(optional)</span>
                 </label>
                 <Input
                   id="birth_date"
                   type="date"
                   value={manualEmployee.birth_date ?? ""}
-                  onChange={(e) => setManualEmployee(prev => ({ ...prev, birth_date: e.target.value }))}
+                  onChange={(e) =>
+                    setManualEmployee((prev) => ({
+                      ...prev,
+                      birth_date: e.target.value,
+                    }))
+                  }
                   className="text-sm h-8"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="email">
-                  Email <span className="text-xs text-gray-400">(optional)</span>
+                <label
+                  className="block text-xs font-medium text-gray-700 mb-1"
+                  htmlFor="email"
+                >
+                  Email{" "}
+                  <span className="text-xs text-gray-400">(optional)</span>
                 </label>
                 <Input
                   id="email"
                   type="email"
                   placeholder="email@example.com"
                   value={manualEmployee.email ?? ""}
-                  onChange={(e) => setManualEmployee(prev => ({ ...prev, email: e.target.value }))}
+                  onChange={(e) =>
+                    setManualEmployee((prev) => ({
+                      ...prev,
+                      email: e.target.value,
+                    }))
+                  }
                   className="text-sm h-8"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="phone">
-                  Phone <span className="text-xs text-gray-400">(optional)</span>
+                <label
+                  className="block text-xs font-medium text-gray-700 mb-1"
+                  htmlFor="phone"
+                >
+                  Phone{" "}
+                  <span className="text-xs text-gray-400">(optional)</span>
                 </label>
                 <Input
                   id="phone"
                   placeholder="Phone number"
                   value={manualEmployee.phone ?? ""}
-                  onChange={(e) => setManualEmployee(prev => ({ ...prev, phone: e.target.value }))}
+                  onChange={(e) =>
+                    setManualEmployee((prev) => ({
+                      ...prev,
+                      phone: e.target.value,
+                    }))
+                  }
                   className="text-sm h-8"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="hire_date">
-                  Hire Date <span className="text-xs text-gray-400">(optional)</span>
+                <label
+                  className="block text-xs font-medium text-gray-700 mb-1"
+                  htmlFor="hire_date"
+                >
+                  Hire Date{" "}
+                  <span className="text-xs text-gray-400">(optional)</span>
                 </label>
                 <Input
                   id="hire_date"
                   type="date"
                   value={manualEmployee.hire_date ?? ""}
-                  onChange={(e) => setManualEmployee(prev => ({ ...prev, hire_date: e.target.value }))}
+                  onChange={(e) =>
+                    setManualEmployee((prev) => ({
+                      ...prev,
+                      hire_date: e.target.value,
+                    }))
+                  }
                   className="text-sm h-8"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-900 mb-1" htmlFor="role">
+                <label
+                  className="block text-xs font-bold text-gray-900 mb-1"
+                  htmlFor="role"
+                >
                   Role <span className="text-red-500">*</span>
                 </label>
                 <Input
                   id="role"
                   placeholder="Job role"
                   value={manualEmployee.role ?? ""}
-                  onChange={(e) => setManualEmployee(prev => ({ ...prev, role: e.target.value }))}
+                  onChange={(e) =>
+                    setManualEmployee((prev) => ({
+                      ...prev,
+                      role: e.target.value,
+                    }))
+                  }
                   required
                   className="text-sm h-8"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="department">
-                  Department <span className="text-xs text-gray-400">(optional)</span>
+                <label
+                  className="block text-xs font-medium text-gray-700 mb-1"
+                  htmlFor="department"
+                >
+                  Department{" "}
+                  <span className="text-xs text-gray-400">(optional)</span>
                 </label>
                 <Input
                   id="department"
                   placeholder="Department"
                   value={manualEmployee.department ?? ""}
-                  onChange={(e) => setManualEmployee(prev => ({ ...prev, department: e.target.value }))}
+                  onChange={(e) =>
+                    setManualEmployee((prev) => ({
+                      ...prev,
+                      department: e.target.value,
+                    }))
+                  }
                   className="text-sm h-8"
                 />
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="salary">
-                  Salary <span className="text-xs text-gray-400">(optional)</span>
+                <label
+                  className="block text-xs font-medium text-gray-700 mb-1"
+                  htmlFor="salary"
+                >
+                  Salary{" "}
+                  <span className="text-xs text-gray-400">(optional)</span>
                 </label>
                 <Input
                   id="salary"
@@ -351,28 +436,37 @@ export function TableCards() {
                   value={manualEmployee.salary ?? ""}
                   onChange={(e) => {
                     const val = e.target.value;
-                    setManualEmployee(prev => ({ ...prev, salary: val === "" ? null : parseFloat(val) }));
+                    setManualEmployee((prev) => ({
+                      ...prev,
+                      salary: val === "" ? null : parseFloat(val),
+                    }));
                   }}
                   className="text-sm h-8 max-w-xs"
                 />
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="key-skills">
-                  Key Skills <span className="text-xs text-gray-400">(optional)</span>
+                <label
+                  className="block text-xs font-medium text-gray-700 mb-1"
+                  htmlFor="key-skills"
+                >
+                  Key Skills{" "}
+                  <span className="text-xs text-gray-400">(optional)</span>
                 </label>
                 <Select
                   id="key-skills"
                   instanceId="key-skills"
                   isMulti
                   options={skillOptions}
-                  value={skillOptions.filter(option => 
-                    manualEmployee.skill_ids.includes(option.value)
+                  value={skillOptions.filter((option) =>
+                    manualEmployee.skill_ids.includes(option.value),
                   )}
                   onChange={(selectedOptions) => {
-                    setManualEmployee(prev => ({
+                    setManualEmployee((prev) => ({
                       ...prev,
-                      skill_ids: selectedOptions ? selectedOptions.map(opt => Number(opt.value)) : [],
+                      skill_ids: selectedOptions
+                        ? selectedOptions.map((opt) => Number(opt.value))
+                        : [],
                     }));
                   }}
                   styles={customSelectStyles}
@@ -385,10 +479,17 @@ export function TableCards() {
                 <span className="font-medium">*</span> Required fields
               </div>
               <div className="flex gap-2 justify-end pt-2 md:col-span-2">
-                <Button type="button" variant="ghost" size="sm" onClick={() => setManualMode(false)}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setManualMode(false)}
+                >
                   Cancel
                 </Button>
-                <Button type="submit" size="sm">Save</Button>
+                <Button type="submit" size="sm">
+                  Save
+                </Button>
               </div>
             </form>
           )}

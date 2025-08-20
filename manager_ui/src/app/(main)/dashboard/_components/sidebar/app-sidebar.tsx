@@ -28,7 +28,7 @@ const data = {
       url: "#",
       icon: CircleHelp,
     },
-  ]
+  ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -37,10 +37,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-1.5">
+            <SidebarMenuButton
+              asChild
+              className="data-[slot=sidebar-menu-button]:!p-1.5"
+            >
               <a href="#">
-                <img src="/logo-mini.png" alt="Logo" className="w-8 rounded-full" />
-                <span className="text-base font-semibold">{APP_CONFIG.name}</span>
+                <img
+                  src="/logo-mini.png"
+                  alt="Logo"
+                  className="w-8 rounded-full"
+                />
+                <span className="text-base font-semibold">
+                  {APP_CONFIG.name}
+                </span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -49,8 +58,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <NavMain items={sidebarItems} />
       </SidebarContent>
-      <SidebarFooter>
-      </SidebarFooter>
+      <SidebarFooter></SidebarFooter>
     </Sidebar>
   );
 }

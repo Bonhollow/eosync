@@ -16,7 +16,17 @@ const compat = new FlatCompat({
 /** @type {import('eslint').Linter.Config[]} */
 export default [
   { files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"] },
-  { ignores: [".github/", ".husky/", "node_modules/", ".next/", "src/components/ui", "*.config.ts", "*.mjs"] },
+  {
+    ignores: [
+      ".github/",
+      ".husky/",
+      "node_modules/",
+      ".next/",
+      "src/components/ui",
+      "*.config.ts",
+      "*.mjs",
+    ],
+  },
   {
     languageOptions: {
       globals: globals.browser,
@@ -68,7 +78,14 @@ export default [
       "import/order": [
         "error",
         {
-          groups: ["builtin", "external", "internal", "parent", "sibling", "index"],
+          groups: [
+            "builtin",
+            "external",
+            "internal",
+            "parent",
+            "sibling",
+            "index",
+          ],
           pathGroups: [
             {
               pattern: "react",
@@ -121,7 +138,10 @@ export default [
 
       // Complexity
       complexity: ["error", { max: 10 }],
-      "max-lines": ["error", { max: 300, skipBlankLines: true, skipComments: true }],
+      "max-lines": [
+        "error",
+        { max: 300, skipBlankLines: true, skipComments: true },
+      ],
       "max-depth": ["error", 4],
 
       // TypeScript-Specific Rules (customized)

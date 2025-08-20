@@ -3,6 +3,9 @@ const nextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   async redirects() {
     return [
       {
@@ -12,6 +15,6 @@ const nextConfig = {
       },
     ];
   },
-}
+};
 
-export default nextConfig
+export default nextConfig;

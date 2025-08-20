@@ -1,6 +1,8 @@
 import { z } from "zod";
 
-const emptyStringToNull = z.string().transform((val) => val === "" ? null : val);
+const emptyStringToNull = z
+  .string()
+  .transform((val) => (val === "" ? null : val));
 
 const employeeBaseSchema = z.object({
   id: z.number(),
@@ -13,10 +15,12 @@ const employeeBaseSchema = z.object({
   role: z.string(),
   department: z.string(),
   salary: z.number(),
-  skills: z.array(z.object({
-    id: z.string().or(z.number()),
-    name: z.string(),
-  })),
+  skills: z.array(
+    z.object({
+      id: z.string().or(z.number()),
+      name: z.string(),
+    }),
+  ),
 });
 
 export const employeeSchema = z.object({
@@ -30,10 +34,14 @@ export const employeeSchema = z.object({
   role: z.string(),
   department: emptyStringToNull.nullable().optional(),
   salary: z.number().nullable().optional(),
-  skills: z.array(z.object({
-    id: z.string().or(z.number()),
-    name: z.string(),
-  })).optional(),
+  skills: z
+    .array(
+      z.object({
+        id: z.string().or(z.number()),
+        name: z.string(),
+      }),
+    )
+    .optional(),
 });
 
 export const employeeCreateSchema = z.object({
@@ -46,10 +54,14 @@ export const employeeCreateSchema = z.object({
   role: z.string(),
   department: emptyStringToNull.nullable().optional(),
   salary: z.number().nullable().optional().or(z.literal(0)),
-  skills: z.array(z.object({
-    id: z.string().or(z.number()),
-    name: z.string(),
-  })).optional(),
+  skills: z
+    .array(
+      z.object({
+        id: z.string().or(z.number()),
+        name: z.string(),
+      }),
+    )
+    .optional(),
 });
 
 export const employeeUpdateSchema = z.object({
@@ -62,17 +74,23 @@ export const employeeUpdateSchema = z.object({
   role: emptyStringToNull.nullable().optional(),
   department: emptyStringToNull.nullable().optional(),
   salary: z.number().nullable().optional(),
-  skills: z.array(z.object({
-    id: z.string().or(z.number()),
-    name: z.string(),
-  })).optional(),
+  skills: z
+    .array(
+      z.object({
+        id: z.string().or(z.number()),
+        name: z.string(),
+      }),
+    )
+    .optional(),
 });
 
 export type Employee = z.infer<typeof employeeSchema>;
 export type EmployeeCreate = z.infer<typeof employeeCreateSchema>;
 export type EmployeeUpdate = z.infer<typeof employeeUpdateSchema>;
 
-export const cleanEmployeeData = (data: Partial<EmployeeCreate>): EmployeeCreate => {
+export const cleanEmployeeData = (
+  data: Partial<EmployeeCreate>,
+): EmployeeCreate => {
   return {
     first_name: data.first_name === "" ? null : data.first_name || null,
     last_name: data.last_name || "",

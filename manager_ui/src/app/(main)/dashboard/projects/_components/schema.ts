@@ -1,10 +1,6 @@
 import { z } from "zod";
 
-export const taskStatusEnum = z.enum([
-  "To Do",
-  "In Progress",
-  "Done",
-]);
+export const taskStatusEnum = z.enum(["To Do", "In Progress", "Done"]);
 
 export const employeeSchema = z.object({
   id: z.number(),
@@ -42,13 +38,20 @@ export const projectSchema = z.object({
   tasks: z.array(taskSchema).optional().default([]),
 });
 
-export const newProjectPayloadSchema = projectSchema.omit({ id: true, tasks: true }).extend({
-  tasks: z.array(taskSchema.omit({ id: true, project_id: true })).optional(),
+export const newProjectPayloadSchema = projectSchema
+  .omit({ id: true, tasks: true })
+  .extend({
+    tasks: z.array(taskSchema.omit({ id: true, project_id: true })).optional(),
+  });
+
+export const newTaskPayloadSchema = taskSchema.omit({
+  id: true,
+  assignments: true,
 });
 
-export const newTaskPayloadSchema = taskSchema.omit({ id: true, assignments: true });
-
-export const newAssignmentPayloadSchema = assignmentSchema.omit({ employee: true });
+export const newAssignmentPayloadSchema = assignmentSchema.omit({
+  employee: true,
+});
 
 export type Project = z.infer<typeof projectSchema>;
 export type Task = z.infer<typeof taskSchema>;
